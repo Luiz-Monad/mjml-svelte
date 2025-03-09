@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Build and Test
+on:
+  workflow_call: # Allow other workflows to use it
+  workflow_dispatch: # Allow running the workflow manually from the GitHub UI
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Get all history to allow automatic versioning using MinVer
+
+      # Install pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.5.2
+
+      # Install node
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.x'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+
+      # Install node_modules
+      - name: Install modules
+        run: pnpm install --frozen-lockfile
+
+      # Build binaries
+      - name: Build
+        run: pnpm build
+
+      # Run tests
+      - name: Test
+        run: pnpm test
