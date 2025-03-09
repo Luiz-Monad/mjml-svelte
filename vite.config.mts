@@ -2,7 +2,7 @@ import path from 'node:path';
 import type { UserConfigFn } from 'vite';
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { copy } from 'vite-plugin-copy';
+import { packagePlugin } from './vite-package.mts';
 
 const src_components = path
   .resolve(import.meta.dirname, './src/components')
@@ -14,19 +14,8 @@ const paths = (source: string) =>
 
 const external = (source: string) => source.endsWith('.svelte');
 
-export default defineConfig((config) => ({
-  plugins: [
-    svelte(),
-    copy(
-      [
-        {
-          src: `${src_components}/**/*.svelte`,
-          dest: tgt_components
-        }
-      ],
-      { hook: 'closeBundle' }
-    )
-  ],
+export default defineConfig({
+  plugins: [svelte(), packagePlugin(src_components, tgt_components)],
   build: {
     lib: {
       entry: './src/index.ts',
@@ -55,4 +44,4 @@ export default defineConfig((config) => ({
       $components: src_components
     }
   }
-})) satisfies UserConfigFn;
+});
