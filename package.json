@@ -1,0 +1,102 @@
+{
+  "name": "mjml-svelte",
+  "type": "module",
+  "version": "1.0.0",
+  "author": "Luiz Stangarlin <luiz.monad@gmail.com>",
+  "keywords": [
+    "vite",
+    "svelte",
+    "sveltekit",
+    "mjml",
+    "mail",
+    "email"
+  ],
+  "repository": "github:Luiz-Monad/mjml-svelte",
+  "bugs": {
+    "url": "https://github.com/Luiz-Monad/mjml-svelte/issues",
+    "email": "luiz.monad@gmail.com"
+  },
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "svelte": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "import": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "require": "./dist/index.js"
+      }
+    },
+    "./svelte": {
+      "import": {
+        "types": "./dist/plugin_svelte.d.mts",
+        "import": "./dist/plugin_svelte.mjs"
+      },
+      "require": {
+        "types": "./dist/plugin_svelte.d.ts",
+        "require": "./dist/plugin_svelte.js"
+      }
+    },
+    "./vite": {
+      "import": {
+        "types": "./dist/plugin_vite.d.mts",
+        "import": "./dist/plugin_vite.mjs"
+      },
+      "require": {
+        "types": "./dist/plugin_vite.d.ts",
+        "require": "./dist/plugin_vite.js"
+      }
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "vite build && tsup",
+		"watch": "vite watch",
+    "dev": "cd example && vite dev",
+    "test": "vitest",
+    "lint": "prettier --check . && eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@hyrious/esbuild-plugin-commonjs": "^0.2.4",
+    "@jest/types": "^29.6.3",
+    "@sveltejs/kit": "^2.17.1",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@types/eslint": "^9.6.1",
+    "@types/html-minifier": "^4.0.5",
+    "@types/jest": "^29.5.14",
+    "@types/mjml": "^4.7.4",
+    "@types/node": "^22.10.2",
+    "eslint": "^9.20.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-svelte": "^2.46.1",
+    "prettier": "^3.5.0",
+    "prettier-plugin-svelte": "^3.3.3",
+    "svelte": "^5.20.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.24.0",
+    "vite": "^6.0.3",
+    "vite-plugin-copy": "^0.1.6",
+    "vitest": "^3.0.5"
+  },
+  "peerDependencies": {
+    "vite": "^6.0.3"
+  },
+  "dependencies": {
+    "html-minifier": "^4.0.0",
+    "mjml": "^4.15.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

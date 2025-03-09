@@ -1,0 +1,23 @@
+# http://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 2
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{svg,ts}]
+insert_final_newline = false
+
+[*.{vue,css,ts}]
+indent_style = tab
+
+[package.json]
+indent_style = tab
+
+[pnpm-lock.yaml]
+indent_style = unset

@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "paths": {
+      "$components": ["../src/components"],
+      "$components/*": ["../src/components/*"]
+    },
+    "rootDirs": [".", "./types"],
+    "typeRoots": ["node_modules/@types", "./types"],
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "lib": ["esnext", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "noEmit": true,
+    "target": "esnext",
+    "plugins": [],
+    "strictPropertyInitialization": false,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false,
+    "declaration": true,
+  },
+  "include": [
+    "./types/**/*.d.ts",
+    "../src/**/*.ts",
+    "../src/**/*.svelte",
+    "../tests/**/*.ts",
+    "../tests/**/*.svelte"
+  ],
+}
