@@ -24,7 +24,7 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.mts",
+        "types": "./dist/index.d.ts",
         "import": "./dist/index.mjs"
       },
       "require": {
@@ -34,7 +34,7 @@
     },
     "./svelte": {
       "import": {
-        "types": "./dist/plugin_svelte.d.mts",
+        "types": "./dist/plugin_svelte.d.ts",
         "import": "./dist/plugin_svelte.mjs"
       },
       "require": {
@@ -44,7 +44,7 @@
     },
     "./vite": {
       "import": {
-        "types": "./dist/plugin_vite.d.mts",
+        "types": "./dist/plugin_vite.d.ts",
         "import": "./dist/plugin_vite.mjs"
       },
       "require": {
@@ -59,7 +59,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "vite build && tsup",
+    "build": "vite build",
     "watch": "vite watch",
     "dev": "cd example && vite dev",
     "test": "vitest",
@@ -67,7 +67,6 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@hyrious/esbuild-plugin-commonjs": "^0.2.4",
     "@sveltejs/kit": "^2.17.1",
     "@sveltejs/package": "^2.3.10",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
@@ -75,16 +74,18 @@
     "@types/html-minifier": "^4.0.5",
     "@types/mjml": "^4.7.4",
     "@types/node": "^22.10.2",
+    "eslint": "^9.20.1",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-svelte": "^2.46.1",
-    "eslint": "^9.20.1",
-    "prettier-plugin-svelte": "^3.3.3",
+    "fast-glob": "^3.3.3",
     "prettier": "^3.5.0",
+    "prettier-plugin-svelte": "^3.3.3",
+    "rollup-plugin-auto-external": "^2.0.0",
     "svelte": "^5.20.0",
-    "tsup": "^8.3.5",
-    "typescript-eslint": "^8.24.0",
     "typescript": "^5.7.2",
+    "typescript-eslint": "^8.24.0",
     "vite": "^6.0.3",
+    "vite-plugin-dts": "^4.5.3",
     "vitest": "^3.0.5"
   },
   "peerDependencies": {
