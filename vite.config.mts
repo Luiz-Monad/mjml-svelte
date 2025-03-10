@@ -9,12 +9,13 @@ import glob from 'fast-glob';
 const src_components = path
   .resolve(import.meta.dirname, './src/components')
   .replaceAll(path.sep, path.posix.sep);
+
 const tgt_components = path.resolve(import.meta.dirname, './dist/components');
 
 const paths = (source: string) =>
   source.endsWith('.svelte') ? source.replace('$components', './components') : source;
 
-const external = (await glob('*', { cwd: src_components })).map(id => `$components/${id}`);
+const external = (await glob('*', { cwd: src_components })).map((id) => `$components/${id}`);
 
 export default defineConfig({
   plugins: [
@@ -23,7 +24,7 @@ export default defineConfig({
     dts({
       include: ['./src/**/*.ts', './src/**/*.svelte'],
       insertTypesEntry: true,
-      rollupTypes: true,
+      rollupTypes: true
     })
   ],
   build: {
@@ -32,21 +33,27 @@ export default defineConfig({
         index: './src/index.ts',
         plugin_vite: './src/plugin_vite.ts',
         plugin_svelte: './src/plugin_svelte.ts'
-      },
-      formats: ['es', 'cjs'],
-      fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'mjs' : 'js'}`
+      }
     },
     target: 'node18',
     sourcemap: true,
     minify: false,
     rollupOptions: {
-      plugins: [
-        autoExternal()
+      plugins: [autoExternal()],
+      output: [
+        {
+          format: 'es',
+          entryFileNames: ({ name }) => `${name}.mjs`,
+          chunkFileNames: 'library.mjs',
+          paths
+        },
+        {
+          format: 'cjs',
+          entryFileNames: ({ name }) => `${name}.js`,
+          chunkFileNames: 'library.js',
+          paths
+        }
       ],
-      output: {
-        chunkFileNames: 'library.js',
-        paths
-      },
       external,
       treeshake: {
         moduleSideEffects: 'no-external'
@@ -57,5 +64,5 @@ export default defineConfig({
     alias: {
       $components: src_components
     }
-  },
+  }
 });
