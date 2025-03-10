@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
-import { mjmlPlugin } from '../src/plugin_vite';
+import { mjmlPlugin } from 'mjml-svelte/vite';
 
 export default defineConfig({
   server: {

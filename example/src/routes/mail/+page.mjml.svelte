@@ -1,20 +1,23 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import Mjml from '$components/Mjml.svelte';
-  import MjHead from '$components/MjHead.svelte';
-  import MjTitle from '$components/MjTitle.svelte';
-  import MjBody from '$components/MjBody.svelte';
-  import MjSection from '$components/MjSection.svelte';
-  import MjColumn from '$components/MjColumn.svelte';
-  import MjText from '$components/MjText.svelte';
-  import MjDivider from '$components/MjDivider.svelte';
-  import MjWrapper from '$components/MjWrapper.svelte';
-  import MjRaw from '$components/MjRaw.svelte';
+  import {
+    MjBody,
+    MjColumn,
+    MjHead,
+    Mjml,
+    MjSection,
+    MjStyle,
+    MjTable,
+    MjText,
+    MjTitle,
+    MjWrapper
+  } from 'mjml-svelte';
 </script>
 
 <Mjml>
   <MjHead>
-    <MjTitle>{page.data.title}</MjTitle>
+    <!-- <MjTitle>{page.data.title}</MjTitle> -->
+    <MjTitle>1</MjTitle>
     <MjStyle>
       <style>
         .primary {
@@ -64,16 +67,11 @@
     </MjStyle>
   </MjHead>
 
-  <MjBody css-class="background">
-    <MjWrapper css-class="gradient-bg" padding="0">
+  <MjBody cssClass="background">
+    <MjWrapper cssClass="gradient-bg" padding="0">
       <MjSection padding="40px 0">
         <MjColumn width="600px">
-          <MjSection
-            background-color="white"
-            css-class="shadow"
-            padding="20px"
-            border-radius="12px"
-          >
+          <MjSection backgroundColor="white" cssClass="shadow" padding="20px" borderRadius="12px">
             <MjColumn>
               <MjTable>
                 <tr>
@@ -94,14 +92,14 @@
                     </svg>
                   </td>
                   <td>
-                    <MjText css-class="green" font-size="24px" font-weight="600"
-                      >Subscription Confirmed!</MjText
-                    >
+                    <MjText cssClass="green" fontSize="24px" fontWeight="600">
+                      Subscription Confirmed!
+                    </MjText>
                   </td>
                 </tr>
               </MjTable>
 
-              <MjText css-class="gray" padding-top="16px">
+              <MjText cssClass="gray" paddingTop="16px">
                 <p>We've received your submission and will be in touch shortly.</p>
               </MjText>
             </MjColumn>
