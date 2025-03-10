@@ -11,29 +11,30 @@
   export let containerBackgroundColor: string | undefined = undefined;
   export let cssClass: string | undefined = undefined;
   export let fontFamily: string | undefined = undefined;
-  export let fontSize: string | undefined = undefined;
+  export let fontSize: string | number | undefined = undefined;
   export let fontStyle: 'normal' | 'italic' | 'oblique' | undefined = undefined;
-  export let fontWeight: number | string | undefined = undefined;
-  export let height: string | undefined = undefined;
+  export let fontWeight: string | number | undefined = undefined;
+  export let height: string | number | undefined = undefined;
   export let href: string | undefined = undefined;
-  export let innerPadding: string | undefined = undefined;
-  export let letterSpacing: string | undefined = undefined;
-  export let lineHeight: string | undefined = undefined;
-  export let padding: string | undefined = undefined;
-  export let paddingBottom: string | undefined = undefined;
-  export let paddingLeft: string | undefined = undefined;
-  export let paddingRight: string | undefined = undefined;
-  export let paddingTop: string | undefined = undefined;
+  export let innerPadding: string | number | undefined = undefined;
+  export let letterSpacing: string | number | undefined = undefined;
+  export let lineHeight: string | number | undefined = undefined;
+  export let name: string | undefined = undefined;
+  export let padding: string | number | undefined = undefined;
+  export let paddingBottom: string | number | undefined = undefined;
+  export let paddingLeft: string | number | undefined = undefined;
+  export let paddingRight: string | number | undefined = undefined;
+  export let paddingTop: string | number | undefined = undefined;
   export let rel: string | undefined = undefined;
   export let target: string | undefined = undefined;
-  export let textAlign: string | undefined = undefined;
+  export let textAlign: 'left' | 'center' | 'right' | undefined = undefined;
   export let textDecoration: 'underline' | 'overline' | 'none' | undefined = undefined;
   export let textTransform: 'capitalize' | 'uppercase' | 'lowercase' | 'none' | undefined =
     undefined;
   export let title: string | undefined = undefined;
-  export let verticalAlign: string | undefined = undefined;
-  export let width: string | undefined = undefined;
-  export let children: () => any;
+  export let verticalAlign: 'top' | 'middle' | 'bottom' | undefined = undefined;
+  export let width: string | number | undefined = undefined;
+  export let children: () => any; //raw
 </script>
 
 <svelte:element
@@ -59,6 +60,7 @@
     'inner-padding': innerPadding,
     'letter-spacing': letterSpacing,
     'line-height': lineHeight,
+    name,
     padding,
     'padding-bottom': paddingBottom,
     'padding-left': paddingLeft,

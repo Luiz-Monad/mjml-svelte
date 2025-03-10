@@ -3,6 +3,6 @@
   export let children: () => any;
 </script>
 
-<svelte:element this={'mj-head'}>
+<svelte:element this={'mj-html-attributes'}>
   {@render children()}
 </svelte:element>

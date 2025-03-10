@@ -1,6 +1,7 @@
 <script lang="ts">
+  // export let cssClass: string | undefined = undefined;
   export let position: 'file-start' | undefined = undefined;
-  export let children: () => any;
+  export let children: () => any; //raw
 </script>
 
 <svelte:element

@@ -39,6 +39,9 @@ importers:
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
+      '@types/rollup-plugin-auto-external':
+        specifier: ^2.0.5
+        version: 2.0.5
       eslint:
         specifier: ^9.20.1
         version: 9.22.0(jiti@2.4.1)
@@ -578,6 +581,9 @@ packages:
 
   '@types/relateurl@0.2.33':
     resolution: {integrity: sha512-bTQCKsVbIdzLqZhLkF5fcJQreE4y1ro4DIyVrlDNSCJRRwHhB8Z+4zXXa8jN6eDvc2HbRsEYgbvrnGvi54EpSw==}
+
+  '@types/rollup-plugin-auto-external@2.0.5':
+    resolution: {integrity: sha512-jspE/1q/4MjrC0lilOpF7Ej5z2vvByPq6lb5ERHt9jCRnp0WJRq+SLK9oPfYroy0xhFhDqQoXLeSHcKqATDaoA==}
 
   '@types/uglify-js@3.17.5':
     resolution: {integrity: sha512-TU+fZFBTBcXj/GpDpDaBmgWk/gn96kMZ+uocaFUlV2f8a6WdMzzI44QBCmGcCiYR0Y6ZlNRiyUyKKt5nl/lbzQ==}
@@ -2612,6 +2618,10 @@ snapshots:
       undici-types: 6.20.0
 
   '@types/relateurl@0.2.33': {}
+
+  '@types/rollup-plugin-auto-external@2.0.5':
+    dependencies:
+      rollup: 4.28.1
 
   '@types/uglify-js@3.17.5':
     dependencies:

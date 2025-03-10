@@ -1,9 +1,9 @@
 <script lang="ts">
-  export let width: string | undefined = undefined;
-  export let verticalAlign: 'top' | 'middle' | 'bottom' | undefined = undefined;
   export let backgroundColor: string | undefined = undefined;
-  export let direction: 'ltr' | 'rtl' | undefined = undefined;
   export let cssClass: string | undefined = undefined;
+  export let direction: 'ltr' | 'rtl' | undefined = undefined;
+  export let verticalAlign: 'top' | 'middle' | 'bottom' | undefined = undefined;
+  export let width: string | number | undefined = undefined;
   export let children: () => any;
 </script>
 

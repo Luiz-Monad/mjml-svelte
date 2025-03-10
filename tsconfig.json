@@ -28,9 +28,10 @@
   },
   "include": [
     "./types/**/*.d.ts",
-    "../src/**/*.ts",
-    "../src/**/*.svelte",
-    "../tests/**/*.ts",
-    "../tests/**/*.svelte"
-  ]
+    "./src/**/*.ts",
+    "./src/**/*.svelte",
+    "./tests/**/*.ts",
+    "./tests/**/*.svelte"
+  ],
+  "exclude": ["./node_modules/**", "./example/**"]
 }
