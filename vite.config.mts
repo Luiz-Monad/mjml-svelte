@@ -54,10 +54,7 @@ export default defineConfig({
           paths
         }
       ],
-      external,
-      treeshake: {
-        moduleSideEffects: 'no-external'
-      }
+      external
     }
   },
   resolve: {

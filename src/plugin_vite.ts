@@ -1,5 +1,22 @@
 import { createServer, type Plugin, type ResolvedConfig, type ViteDevServer } from 'vite';
+import mjml2html from 'mjml';
+import { minify } from 'html-minifier';
+
 import { mjmlTransformCode } from './plugin_base';
+
+async function renderMjmlBody(mjmlSvelte: string) {
+  const mjmlTerse = minify(mjmlSvelte, { removeComments: true, collapseWhitespace: true });
+  const mailHtml = mjml2html(mjmlTerse).html;
+  const minifiedHtml = minify(mailHtml, {
+    collapseWhitespace: true,
+    removeComments: false,
+    removeRedundantAttributes: false,
+    removeEmptyAttributes: true,
+    minifyCSS: true,
+    minifyJS: true
+  });
+  return minifiedHtml;
+}
 
 export const mjmlPlugin: () => Plugin[] = () => {
   const buildIdParser = () => {
@@ -75,7 +92,12 @@ export const mjmlPlugin: () => Plugin[] = () => {
           const sveltePage = await server.ssrLoadModule(idPage);
           const svelteLayout = await server.ssrLoadModule(idLayout);
           return {
-            code: await mjmlTransformCode(sveltePage, svelteLayout, opts?.ssr ?? false),
+            code: await mjmlTransformCode(
+              renderMjmlBody,
+              sveltePage,
+              svelteLayout,
+              opts?.ssr ?? false
+            ),
             map: null
           };
         } finally {
