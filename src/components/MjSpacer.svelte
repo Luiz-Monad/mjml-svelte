@@ -12,6 +12,7 @@
   export let paddingLeft: string | number | undefined = undefined;
   export let paddingRight: string | number | undefined = undefined;
   export let paddingTop: string | number | undefined = undefined;
+  // export let children: () => any;
 </script>
 
 <svelte:element
@@ -31,6 +32,4 @@
     'padding-right': paddingRight,
     'padding-top': paddingTop
   }}
->
-  {@render children()}
-</svelte:element>
+/>

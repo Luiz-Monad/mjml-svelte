@@ -50,6 +50,228 @@
         "types": "./dist/plugin_vite.d.ts",
         "require": "./dist/plugin_vite.js"
       }
+    },
+    "./MjAccordion.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjAccordion.svelte.d.ts",
+        "import": "./dist/components/MjAccordion.svelte"
+      }
+    },
+    "./MjAccordionElement.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjAccordionElement.svelte.d.ts",
+        "import": "./dist/components/MjAccordionElement.svelte"
+      }
+    },
+    "./MjAccordionText.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjAccordionText.svelte.d.ts",
+        "import": "./dist/components/MjAccordionText.svelte"
+      }
+    },
+    "./MjAccordionTitle.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjAccordionTitle.svelte.d.ts",
+        "import": "./dist/components/MjAccordionTitle.svelte"
+      }
+    },
+    "./MjAll.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjAll.svelte.d.ts",
+        "import": "./dist/components/MjAll.svelte"
+      }
+    },
+    "./MjAttributes.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjAttributes.svelte.d.ts",
+        "import": "./dist/components/MjAttributes.svelte"
+      }
+    },
+    "./MjBody.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjBody.svelte.d.ts",
+        "import": "./dist/components/MjBody.svelte"
+      }
+    },
+    "./MjBreakpoint.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjBreakpoint.svelte.d.ts",
+        "import": "./dist/components/MjBreakpoint.svelte"
+      }
+    },
+    "./MjButton.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjButton.svelte.d.ts",
+        "import": "./dist/components/MjButton.svelte"
+      }
+    },
+    "./MjCarousel.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjCarousel.svelte.d.ts",
+        "import": "./dist/components/MjCarousel.svelte"
+      }
+    },
+    "./MjCarouselImage.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjCarouselImage.svelte.d.ts",
+        "import": "./dist/components/MjCarouselImage.svelte"
+      }
+    },
+    "./MjClass.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjClass.svelte.d.ts",
+        "import": "./dist/components/MjClass.svelte"
+      }
+    },
+    "./MjColumn.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjColumn.svelte.d.ts",
+        "import": "./dist/components/MjColumn.svelte"
+      }
+    },
+    "./MjDivider.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjDivider.svelte.d.ts",
+        "import": "./dist/components/MjDivider.svelte"
+      }
+    },
+    "./MjFont.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjFont.svelte.d.ts",
+        "import": "./dist/components/MjFont.svelte"
+      }
+    },
+    "./MjGroup.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjGroup.svelte.d.ts",
+        "import": "./dist/components/MjGroup.svelte"
+      }
+    },
+    "./MjHead.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjHead.svelte.d.ts",
+        "import": "./dist/components/MjHead.svelte"
+      }
+    },
+    "./MjHero.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjHero.svelte.d.ts",
+        "import": "./dist/components/MjHero.svelte"
+      }
+    },
+    "./MjHtmlAttribute.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjHtmlAttribute.svelte.d.ts",
+        "import": "./dist/components/MjHtmlAttribute.svelte"
+      }
+    },
+    "./MjHtmlAttributes.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjHtmlAttributes.svelte.d.ts",
+        "import": "./dist/components/MjHtmlAttributes.svelte"
+      }
+    },
+    "./MjImage.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjImage.svelte.d.ts",
+        "import": "./dist/components/MjImage.svelte"
+      }
+    },
+    "./MjInclude.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjInclude.svelte.d.ts",
+        "import": "./dist/components/MjInclude.svelte"
+      }
+    },
+    "./MjRaw.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjRaw.svelte.d.ts",
+        "import": "./dist/components/MjRaw.svelte"
+      }
+    },
+    "./MjSection.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjSection.svelte.d.ts",
+        "import": "./dist/components/MjSection.svelte"
+      }
+    },
+    "./MjSelector.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjSelector.svelte.d.ts",
+        "import": "./dist/components/MjSelector.svelte"
+      }
+    },
+    "./MjSocial.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjSocial.svelte.d.ts",
+        "import": "./dist/components/MjSocial.svelte"
+      }
+    },
+    "./MjSocialElement.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjSocialElement.svelte.d.ts",
+        "import": "./dist/components/MjSocialElement.svelte"
+      }
+    },
+    "./MjSpacer.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjSpacer.svelte.d.ts",
+        "import": "./dist/components/MjSpacer.svelte"
+      }
+    },
+    "./MjStyle.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjStyle.svelte.d.ts",
+        "import": "./dist/components/MjStyle.svelte"
+      }
+    },
+    "./MjTable.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjTable.svelte.d.ts",
+        "import": "./dist/components/MjTable.svelte"
+      }
+    },
+    "./MjText.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjText.svelte.d.ts",
+        "import": "./dist/components/MjText.svelte"
+      }
+    },
+    "./MjTitle.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjTitle.svelte.d.ts",
+        "import": "./dist/components/MjTitle.svelte"
+      }
+    },
+    "./MjWrapper.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjWrapper.svelte.d.ts",
+        "import": "./dist/components/MjWrapper.svelte"
+      }
+    },
+    "./Mjml.svelte": {
+      "svelte": {
+        "types": "./dist/components/Mjml.svelte.d.ts",
+        "import": "./dist/components/Mjml.svelte"
+      }
+    },
+    "./MjNavbar.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjNavbar.svelte.d.ts",
+        "import": "./dist/components/MjNavbar.svelte"
+      }
+    },
+    "./MjNavbarLink.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjNavbarLink.svelte.d.ts",
+        "import": "./dist/components/MjNavbarLink.svelte"
+      }
+    },
+    "./MjPreview.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjPreview.svelte.d.ts",
+        "import": "./dist/components/MjPreview.svelte"
+      }
     }
   },
   "files": [
