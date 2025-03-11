@@ -2,7 +2,6 @@ node_modules
 
 # Output
 .svelte-kit
-/build
 /dist
 
 # OS
@@ -16,8 +15,9 @@ Thumbs.db
 !.env.test
 
 # proj files to ignore formatting
-/static/content
+static/
 src/app.html
+test/expected.html
 
 # Ignore files for PNPM, NPM and YARN
 pnpm-lock.yaml

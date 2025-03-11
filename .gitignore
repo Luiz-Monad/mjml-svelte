@@ -3,6 +3,8 @@ node_modules
 # Output
 .svelte-kit
 /dist
+/test-results
+/playwright-report
 
 # OS
 .DS_Store

@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { type PluginOption } from 'vite';
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import dts from 'vite-plugin-dts';
@@ -19,7 +20,7 @@ const external = (await glob('*', { cwd: src_components })).map((id) => `$compon
 
 export default defineConfig({
   plugins: [
-    svelte(),
+    svelte() as PluginOption,
     packagePlugin(src_components, tgt_components),
     dts({
       include: ['./src/**/*.ts', './src/**/*.svelte'],
