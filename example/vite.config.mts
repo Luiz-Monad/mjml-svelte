@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type PluginOption } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { mjmlPlugin } from 'mjml-svelte/vite';
 
@@ -6,5 +6,8 @@ export default defineConfig({
   server: {
     port: 5080
   },
-  plugins: [sveltekit(), mjmlPlugin()]
+  preview: {
+    port: 5080
+  },
+  plugins: [sveltekit() as PluginOption, mjmlPlugin()]
 });
