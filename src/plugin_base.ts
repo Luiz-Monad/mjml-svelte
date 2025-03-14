@@ -1,42 +1,90 @@
+import type { Page } from '@sveltejs/kit';
+import { SvelteComponent } from 'svelte';
+import { render } from 'svelte/server';
+import { URL } from 'url';
+
 const tag_start = '%%MJML_START%%';
 const tag_end = '%%MJML_END%%';
 
-type Renderer = (mjmlSvelte: string) => Promise<string>;
+interface PageEvent {
+  url: URL;
+}
 
-export const mjmlTransformCode = async (
-  renderMjmlBody: Renderer,
-  sveltePage: any,
-  svelteLayout: any,
-  ssr: boolean
-) => {
-  if (!ssr) {
-    return 'export default (payload) => {}';
-  }
-  let processedCode = '';
-  processedCode += `import { page } from '$app/state';`;
-  processedCode += `export default (payload, props) => {`;
-  processedCode += `  const _route = page.data._route;`;
-  for (const route of svelteLayout.load._routes) {
-    const url = new URL(route, 'http://host/');
-    const data = await svelteLayout.load({ url });
-    const html = { out: '' };
-    sveltePage.default(html, data);
-    const raw = await renderMjmlBody(html.out ?? '');
-    processedCode += `  if (_route === '${route}') {`;
-    processedCode += `    payload.out += '${tag_start}';`;
-    processedCode += `    payload.out += ${JSON.stringify(raw)};`;
-    processedCode += `    payload.out += '${tag_end}';`;
-    processedCode += `  }`;
-  }
-  processedCode += `}`;
-  return processedCode;
+type Renderer = (mjmlSvelte: string) => Promise<string>;
+type PageData = Record<string, any>;
+type PageLoadFn = (event: PageEvent) => Promise<PageData>;
+type PageComponent = { default: typeof SvelteComponent };
+type PageServerComponent = { load: PageLoadFn & { _routes: string[] } };
+
+const createPage = (url: URL, data: PageData): Page => ({
+  error: null,
+  params: {},
+  route: { id: null },
+  status: 200,
+  url: url,
+  data: data,
+  form: null,
+  state: {}
+});
+
+export const requestContextSvelte = {
+  id: '__mjml_svelte/requestContext.svelte',
+  code: `
+		<script lang="ts">
+			import { setContext } from 'svelte';
+			let { page, children } = $props();
+			setContext('__request__', { page });
+		</script>
+		{@render children(page.data)}
+	`
 };
 
-export const loadRoutes = (prerenderRoutes: () => string[], loadFn: Function) => {
+export const mjmlTransformToSvelte = async (
+  renderMjmlBody: Renderer,
+  requestContext: PageComponent,
+  sveltePage: PageComponent,
+  svelteServer: PageServerComponent
+) => {
+  const entries = await Promise.all(
+    svelteServer.load._routes.map(async (route) => {
+      const url = new URL(route, 'http://host/');
+      const data = await svelteServer.load({ url });
+      const page = createPage(url, data);
+      const html = render(requestContext.default, {
+        props: { page, children: sveltePage.default }
+      });
+      return {
+				route,
+				raw: await renderMjmlBody(html.body)
+			};
+    })
+  );
+
+  return `
+    <script lang="ts">
+      import { page } from '$app/state';
+			const _route = page.data._route;
+    </script>
+		${entries.map(
+      ({route, raw}) => `
+		{#if _route === '${route}'}
+			{@html ${JSON.stringify(tag_start)}}
+    	{@html ${JSON.stringify(raw)}}
+			{@html ${JSON.stringify(tag_end)}}
+		{/if}
+		`
+    )}
+  `;
+};
+
+export const loadRoutes = <PageLoadFn extends Function>(
+  prerenderRoutes: () => string[],
+  loadFn: PageLoadFn
+) => {
   return Object.assign(loadFn, { _routes: prerenderRoutes() });
 };
 
-export const loadRoute = <O>(getRoute: () => string, data: O) => {
+export const loadRoute = <PageData>(getRoute: () => string, data: PageData) => {
   return { ...data, _route: getRoute() };
 };
 

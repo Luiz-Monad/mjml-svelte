@@ -16,8 +16,7 @@
 
 <Mjml>
   <MjHead>
-    <!-- <MjTitle>{page.data.title}</MjTitle> -->
-    <MjTitle>1</MjTitle>
+    <MjTitle>{page.data.title}</MjTitle>
     <MjStyle>
       <style>
         .primary {

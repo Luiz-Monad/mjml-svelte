@@ -2,7 +2,7 @@ import { createServer, type Plugin, type ResolvedConfig, type ViteDevServer } fr
 import mjml2html from 'mjml';
 import { minify } from 'html-minifier';
 
-import { mjmlTransformCode } from './plugin_base';
+import { mjmlTransformToSvelte, requestContextSvelte } from './plugin_base';
 
 async function renderMjmlBody(mjmlSvelte: string) {
   const mjmlTerse = minify(mjmlSvelte, { removeComments: true, collapseWhitespace: true });
@@ -58,7 +58,7 @@ export const mjmlPlugin: () => Plugin[] = () => {
   let viteDevServer: ViteDevServer;
   return [
     {
-      name: 'sveltekit-mjml-transform-pre',
+      name: 'svelte-mjml-transform-pre',
       enforce: 'pre',
 
       async config(config) {
@@ -69,7 +69,7 @@ export const mjmlPlugin: () => Plugin[] = () => {
       }
     },
     {
-      name: 'sveltekit-mjml-transform-post',
+      name: 'svelte-mjml-transform-post',
       enforce: 'post',
 
       async configResolved(config) {
@@ -81,24 +81,34 @@ export const mjmlPlugin: () => Plugin[] = () => {
         viteDevServer = server;
       },
 
-      async transform(code, id, opts) {
+      resolveId(id, importer) {
+        if (id === requestContextSvelte.id) {
+          return id;
+        }
+      },
+
+      async load(id) {
+        if (id === requestContextSvelte.id) {
+          return requestContextSvelte.code;
+        }
         const req = requestParser(id);
         if (!req) return;
         if (getQueryParam(req.rawQuery, 'mjml')) return;
         const server = viteDevServer ?? (await createServer());
         try {
           const idPage = appendQueryParam(id, 'mjml', '1');
-          const idLayout = serverId(idPage);
-          const sveltePage = await server.ssrLoadModule(idPage);
-          const svelteLayout = await server.ssrLoadModule(idLayout);
+          const idServer = serverId(idPage);
+          const sveltePage = (await server.ssrLoadModule(idPage)) as any;
+          const svelteServer = (await server.ssrLoadModule(idServer)) as any;
+          const svelteContext = (await server.ssrLoadModule(requestContextSvelte.id)) as any;
+          const svelteComponent = await mjmlTransformToSvelte(
+            renderMjmlBody,
+            svelteContext,
+            sveltePage,
+            svelteServer
+          );
           return {
-            code: await mjmlTransformCode(
-              renderMjmlBody,
-              sveltePage,
-              svelteLayout,
-              opts?.ssr ?? false
-            ),
-            map: null
+            code: svelteComponent
           };
         } finally {
           if (!viteDevServer) {

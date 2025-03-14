@@ -1,4 +1,4 @@
-import { type Handle, type Load as LoadFn } from '@sveltejs/kit';
+import { type Handle, type LoadEvent, type Load } from '@sveltejs/kit';
 
 import { loadRoute, loadRoutes, mjmlFilterHtml } from './plugin_base';
 
@@ -9,12 +9,12 @@ export const mjmlServerPageLoad = <
   OutputData extends Record<string, unknown> | void,
   RouteId extends string | null
 >(
-  loadBase: LoadFn<Params, InputData, ParentData, OutputData, RouteId>,
+  loadBase: Load<Params, InputData, ParentData, OutputData, RouteId>,
   prerenderRoutes: () => string[],
   getRoute: (data: OutputData) => string
 ) => {
-  const load: LoadFn<Params, InputData, ParentData, OutputData, RouteId> = async (args) => {
-    const data = await loadBase(args);
+  const load = async (event: LoadEvent<Params, InputData, ParentData, RouteId>) => {
+    const data = await loadBase(event);
     return loadRoute(() => getRoute(data), data);
   };
   return loadRoutes(prerenderRoutes, load);
