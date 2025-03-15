@@ -38,6 +38,10 @@ jobs:
       - name: Install modules
         run: pnpm install --frozen-lockfile
 
+      # Install chromium
+      - name: Install chromium
+        run: pnpm exec playwright install chromium
+
       # Build binaries
       - name: Build
         run: pnpm build
