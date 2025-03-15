@@ -19,5 +19,5 @@ test('renders the +page.mjml.svelte and checks HTML output', async () => {
   // writeFileSync(expectedHtmlPath, htmlContent);
 
   // Compare the actual HTML content with the expected HTML content
-  expect(htmlContent.replaceAll('>', '>\n')).toContain(expectedHtml.replaceAll('>', '>\n'));
+  expect(htmlContent).toContain(expectedHtml);
 });

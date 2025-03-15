@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: NuGet Publish
+name: NPM Publish
 on:
   workflow_dispatch: # Allow running the workflow manually from the GitHub UI
   push:
