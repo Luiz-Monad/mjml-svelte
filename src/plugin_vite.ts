@@ -1,6 +1,7 @@
 import { createServer, type Plugin, type ResolvedConfig, type ViteDevServer } from 'vite';
 import mjml2html from 'mjml';
 import { minify } from 'html-minifier';
+import MagicString from 'magic-string';
 
 import { mjmlTransformToSvelte, requestContextSvelte } from './plugin_base';
 
@@ -89,7 +90,17 @@ export const mjmlPlugin: () => Plugin[] = () => {
 
       async load(id) {
         if (id === requestContextSvelte.id) {
-          return requestContextSvelte.code;
+          const magicString = new MagicString(requestContextSvelte.code);
+          const map = magicString.generateMap({
+            source: id,
+            file: id,
+            includeContent: true,
+            hires: true
+          });
+          return {
+            code: magicString.toString(),
+            map
+          };
         }
         const req = requestParser(id);
         if (!req) return;

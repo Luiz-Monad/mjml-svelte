@@ -6,7 +6,7 @@
       "type": "shell",
       "command": "./node-inspect.ps1",
       "options": {
-        "cwd": "${workspaceFolder}/",
+        "cwd": "${workspaceFolder}/scripts",
         "shell": { "args": ["-NoProfile"] }
       }
     }

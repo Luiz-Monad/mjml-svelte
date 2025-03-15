@@ -30,13 +30,13 @@ const createPage = (url: URL, data: PageData): Page => ({
 export const requestContextSvelte = {
   id: '__mjml_svelte/requestContext.svelte',
   code: `
-		<script lang="ts">
-			import { setContext } from 'svelte';
-			let { page, children } = $props();
-			setContext('__request__', { page });
-		</script>
-		{@render children(page.data)}
-	`
+    <script lang="ts">
+      import { setContext } from 'svelte';
+      let { page, children } = $props();
+      setContext('__request__', { page });
+    </script>
+    {@render children(page.data)}
+  `.replaceAll('    ', '')
 };
 
 export const mjmlTransformToSvelte = async (
@@ -54,27 +54,27 @@ export const mjmlTransformToSvelte = async (
         props: { page, children: sveltePage.default }
       });
       return {
-				route,
-				raw: await renderMjmlBody(html.body)
-			};
+        route,
+        raw: await renderMjmlBody(html.body)
+      };
     })
   );
 
   return `
     <script lang="ts">
       import { page } from '$app/state';
-			const _route = page.data._route;
+      const _route = page.data._route;
     </script>
-		${entries.map(
-      ({route, raw}) => `
-		{#if _route === '${route}'}
-			{@html ${JSON.stringify(tag_start)}}
-    	{@html ${JSON.stringify(raw)}}
-			{@html ${JSON.stringify(tag_end)}}
-		{/if}
-		`
+    ${entries.map(
+      ({ route, raw }) => `
+    {#if _route === '${route}'}
+      {@html ${JSON.stringify(tag_start)}}
+      {@html ${JSON.stringify(raw)}}
+      {@html ${JSON.stringify(tag_end)}}
+    {/if}
+    `
     )}
-  `;
+  `.replaceAll('    ', '');
 };
 
 export const loadRoutes = <PageLoadFn extends Function>(
