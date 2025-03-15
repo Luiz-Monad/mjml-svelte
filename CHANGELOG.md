@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.0.0...v1.0.1) (2025-03-15)
+
+
+### Bug Fixes
+
+* install chromium on test ([a41d7a0](https://github.com/Luiz-Monad/mjml-svelte/commit/a41d7a06c0d640320fc264386e1a9a313007e88c))
+
 ## 1.0.0 (2025-03-15)
 
 
