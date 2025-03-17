@@ -10,11 +10,15 @@ interface PageEvent {
   url: URL;
 }
 
-type Renderer = (mjmlSvelte: string) => Promise<string>;
+type Loader = (url: string) => Promise<PageComponent>;
+type Renderer = (mjmlSvelte: string, isRaw: boolean) => Promise<string>;
 type PageData = Record<string, any>;
 type PageLoadFn = (event: PageEvent) => Promise<PageData>;
 type PageComponent = { default: typeof SvelteComponent };
-type PageServerComponent = { load: PageLoadFn & { _routes: string[] } };
+type PageServerComponent = {
+  load: PageLoadFn & { _routes: string[] };
+  _raw?: boolean;
+};
 
 const createPage = (url: URL, data: PageData): Page => ({
   error: null,
@@ -39,6 +43,17 @@ export const requestContextSvelte = {
   `.replaceAll('    ', '')
 };
 
+export const mjmlProcessInclude = async (loader: Loader, url: string): Promise<PageComponent> => {
+  let page = await loader(url);
+  let str: string;
+  while ((str = page.default.toString()).includes('__mjml_include')) {
+    const includeMatch = str.match(/__mjml_include.*?=.*?['"]([^'"]+)['"]/);
+    if (!includeMatch || !includeMatch[1]) break;
+    page = await loader(includeMatch[1]);
+  }
+  return page;
+};
+
 export const mjmlTransformToSvelte = async (
   requestContext: PageComponent,
   sveltePage: PageComponent,
@@ -48,6 +63,7 @@ export const mjmlTransformToSvelte = async (
   const entries = await Promise.all(
     svelteServer.load._routes.map(async (route) => {
       const url = new URL(route, 'http://host/');
+      const isRaw = !!svelteServer._raw;
       const data = await svelteServer.load({ url });
       const page = createPage(url, data);
       const html = render(requestContext.default, {
@@ -55,7 +71,7 @@ export const mjmlTransformToSvelte = async (
       });
       return {
         route,
-        raw: await renderMjmlBody(html.body)
+        raw: await renderMjmlBody(html.body, isRaw)
       };
     })
   );

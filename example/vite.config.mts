@@ -9,5 +9,5 @@ export default defineConfig({
   preview: {
     port: 5080
   },
-  plugins: [sveltekit() as PluginOption, mjmlPlugin()]
+  plugins: [sveltekit() as PluginOption, mjmlPlugin() as PluginOption]
 });

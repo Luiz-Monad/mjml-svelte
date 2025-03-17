@@ -3,7 +3,7 @@ import mjml2html from 'mjml';
 import { minify } from 'html-minifier';
 import MagicString from 'magic-string';
 
-import { mjmlTransformToSvelte, requestContextSvelte } from './plugin_base';
+import { mjmlProcessInclude, mjmlTransformToSvelte, requestContextSvelte } from './plugin_base';
 
 async function renderMjmlBody(mjmlSvelte: string, isRaw: boolean) {
   const mjmlTerse = minify(mjmlSvelte, { removeComments: true, collapseWhitespace: true });
@@ -52,18 +52,12 @@ export function mjmlPlugin(): Plugin[] {
     return urlParams.has(param) ? urlParams.get(param) : null;
   };
 
+  const normalizeId = (baseId: string, id: string) => {
+    const normalizedPath = new URL(id, new URL(baseId, base)).href;
+    return normalizedPath.replace(base, '');
+  };
+
   const serverId = (id: string) => id.replace('.mjml.svelte', '.server.ts');
-
-  const isRawQuery = (id: string) => {
-    const url = new URL(id, base);
-    return url.searchParams.get('raw');
-  };
-
-  const removeRawQuery = (id: string) => {
-    const parsedUrl = new URL(id, base);
-    parsedUrl.searchParams.delete('raw');
-    return parsedUrl.toString().replace(base, '');
-  };
 
   let requestParser: ReturnType<typeof buildIdParser>;
   let viteConfig: ResolvedConfig;
@@ -93,7 +87,7 @@ export function mjmlPlugin(): Plugin[] {
         viteDevServer = server;
       },
 
-      resolveId(id, importer, options) {
+      resolveId(id) {
         if (id === requestContextSvelte.id) {
           return id;
         }
@@ -117,17 +111,19 @@ export function mjmlPlugin(): Plugin[] {
         if (!req) return;
         if (getQueryParam(req.rawQuery, 'mjml')) return;
         const server = viteDevServer ?? (await createServer());
+        const loader = (subId: string) =>
+          server.ssrLoadModule(appendQueryParam(normalizeId(id, subId), 'mjml', '1'));
         try {
           const idPage = appendQueryParam(id, 'mjml', '1');
           const idServer = serverId(idPage);
-          const sveltePage = (await server.ssrLoadModule(idPage)) as any;
+          const sveltePage = (await mjmlProcessInclude(loader as any, idPage)) as any;
           const svelteServer = (await server.ssrLoadModule(idServer)) as any;
           const svelteContext = (await server.ssrLoadModule(requestContextSvelte.id)) as any;
           const svelteComponent = await mjmlTransformToSvelte(
             svelteContext,
             sveltePage,
             svelteServer,
-            (data) => renderMjmlBody(data, !!viteConfig.inlineConfig.mjmlPluginRaw)
+            renderMjmlBody
           );
           return {
             code: svelteComponent
@@ -138,52 +134,6 @@ export function mjmlPlugin(): Plugin[] {
           }
         }
       }
-    },
-    {
-      name: 'svelte-mjml-transform-dev',
-      enforce: 'pre',
-
-      configureServer(server) {
-        server.middlewares.use(async function mjmlTransformMiddleware(req, res, next) {
-          try {
-            if (!req.url || !isRawQuery(req.url)) {
-              return next();
-            }
-            req.url = removeRawQuery(req.url);
-            const server = await createServer({
-              mjmlPluginRaw: true,
-              server: {
-                middlewareMode: true,
-                watch: null
-              }
-            });
-            remove_vite_middlewares(server.middlewares);
-            try {
-              await new Promise((done) => {
-                server.middlewares.handle(req, res, done);
-              });
-            } catch (err) {
-              const e = err as Error;
-              res.statusCode = 500;
-              res.statusMessage = e.message;
-              res.end(e.stack);
-            } finally {
-              await server.close();
-            }
-          } catch {
-            return next();
-          }
-        });
-      }
     }
   ];
-}
-
-function remove_vite_middlewares(server: ViteDevServer['middlewares']) {
-  for (let i = server.stack.length - 1; i > 0; i--) {
-    const handle = server.stack[i].handle;
-    if ('name' in handle && handle.name.startsWith('vite')) {
-      server.stack.splice(i, 1);
-    }
-  }
 }
