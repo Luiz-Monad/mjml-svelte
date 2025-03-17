@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
   }
   let sourceMjml = '';
   try {
-    const response = await fetch('/mail?raw=1');
+    const response = await fetch('/mail/raw');
     if (response.ok) {
       sourceMjml = format(await response.text());
     } else {
