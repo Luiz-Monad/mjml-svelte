@@ -4,7 +4,7 @@ const config = {
   kit: {
     alias: {
       $components: './src/components',
-      $lib: './src/lib'
+      $library: './src/library'
     }
   }
 };

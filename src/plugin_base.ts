@@ -1,5 +1,5 @@
 import type { Page } from '@sveltejs/kit';
-import { SvelteComponent } from 'svelte';
+import type { SvelteComponent } from 'svelte';
 import { render } from 'svelte/server';
 import { URL } from 'url';
 
@@ -40,10 +40,10 @@ export const requestContextSvelte = {
 };
 
 export const mjmlTransformToSvelte = async (
-  renderMjmlBody: Renderer,
   requestContext: PageComponent,
   sveltePage: PageComponent,
-  svelteServer: PageServerComponent
+  svelteServer: PageServerComponent,
+  renderMjmlBody: Renderer
 ) => {
   const entries = await Promise.all(
     svelteServer.load._routes.map(async (route) => {

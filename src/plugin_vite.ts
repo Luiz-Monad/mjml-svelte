@@ -5,10 +5,13 @@ import MagicString from 'magic-string';
 
 import { mjmlTransformToSvelte, requestContextSvelte } from './plugin_base';
 
-async function renderMjmlBody(mjmlSvelte: string) {
+async function renderMjmlBody(mjmlSvelte: string, isRaw: boolean) {
   const mjmlTerse = minify(mjmlSvelte, { removeComments: true, collapseWhitespace: true });
-  const mailHtml = mjml2html(mjmlTerse).html;
-  const minifiedHtml = minify(mailHtml, {
+  if (isRaw) return mjmlTerse;
+  const mjmlMail = mjml2html(mjmlTerse, {
+    fonts: {}
+  });
+  const minifiedHtml = minify(mjmlMail.html, {
     collapseWhitespace: true,
     removeComments: false,
     removeRedundantAttributes: false,
@@ -19,7 +22,7 @@ async function renderMjmlBody(mjmlSvelte: string) {
   return minifiedHtml;
 }
 
-export const mjmlPlugin: () => Plugin[] = () => {
+export function mjmlPlugin(): Plugin[] {
   const buildIdParser = () => {
     const filter = (id: string) => {
       return id.endsWith('.mjml.svelte');
@@ -36,12 +39,9 @@ export const mjmlPlugin: () => Plugin[] = () => {
     };
   };
 
-  const appendQueryParam = (
-    url: string,
-    param: string,
-    value: string,
-    base: string = 'http://dummy-base'
-  ) => {
+  const base = 'http://host';
+
+  const appendQueryParam = (url: string, param: string, value: string) => {
     const parsedUrl = new URL(url, base);
     parsedUrl.searchParams.set(param, value);
     return parsedUrl.toString().replace(base, '');
@@ -53,6 +53,17 @@ export const mjmlPlugin: () => Plugin[] = () => {
   };
 
   const serverId = (id: string) => id.replace('.mjml.svelte', '.server.ts');
+
+  const isRawQuery = (id: string) => {
+    const url = new URL(id, base);
+    return url.searchParams.get('raw');
+  };
+
+  const removeRawQuery = (id: string) => {
+    const parsedUrl = new URL(id, base);
+    parsedUrl.searchParams.delete('raw');
+    return parsedUrl.toString().replace(base, '');
+  };
 
   let requestParser: ReturnType<typeof buildIdParser>;
   let viteConfig: ResolvedConfig;
@@ -82,7 +93,7 @@ export const mjmlPlugin: () => Plugin[] = () => {
         viteDevServer = server;
       },
 
-      resolveId(id, importer) {
+      resolveId(id, importer, options) {
         if (id === requestContextSvelte.id) {
           return id;
         }
@@ -113,10 +124,10 @@ export const mjmlPlugin: () => Plugin[] = () => {
           const svelteServer = (await server.ssrLoadModule(idServer)) as any;
           const svelteContext = (await server.ssrLoadModule(requestContextSvelte.id)) as any;
           const svelteComponent = await mjmlTransformToSvelte(
-            renderMjmlBody,
             svelteContext,
             sveltePage,
-            svelteServer
+            svelteServer,
+            (data) => renderMjmlBody(data, !!viteConfig.inlineConfig.mjmlPluginRaw)
           );
           return {
             code: svelteComponent
@@ -127,6 +138,52 @@ export const mjmlPlugin: () => Plugin[] = () => {
           }
         }
       }
+    },
+    {
+      name: 'svelte-mjml-transform-dev',
+      enforce: 'pre',
+
+      configureServer(server) {
+        server.middlewares.use(async function mjmlTransformMiddleware(req, res, next) {
+          try {
+            if (!req.url || !isRawQuery(req.url)) {
+              return next();
+            }
+            req.url = removeRawQuery(req.url);
+            const server = await createServer({
+              mjmlPluginRaw: true,
+              server: {
+                middlewareMode: true,
+                watch: null
+              }
+            });
+            remove_vite_middlewares(server.middlewares);
+            try {
+              await new Promise((done) => {
+                server.middlewares.handle(req, res, done);
+              });
+            } catch (err) {
+              const e = err as Error;
+              res.statusCode = 500;
+              res.statusMessage = e.message;
+              res.end(e.stack);
+            } finally {
+              await server.close();
+            }
+          } catch {
+            return next();
+          }
+        });
+      }
     }
   ];
-};
+}
+
+function remove_vite_middlewares(server: ViteDevServer['middlewares']) {
+  for (let i = server.stack.length - 1; i > 0; i--) {
+    const handle = server.stack[i].handle;
+    if ('name' in handle && handle.name.startsWith('vite')) {
+      server.stack.splice(i, 1);
+    }
+  }
+}

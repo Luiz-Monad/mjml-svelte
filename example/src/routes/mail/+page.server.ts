@@ -1,7 +1,7 @@
 import { mjmlServerPageLoad } from 'mjml-svelte/svelte';
 
 export const load = mjmlServerPageLoad(
-  () => ({ title: 'mail-test' }),
+  (event) => ({ title: 'mail-test' }),
   () => ['/'],
-  (data) => '/'
+  (event, data) => '/'
 );

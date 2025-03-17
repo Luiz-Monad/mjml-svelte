@@ -3,17 +3,18 @@
 
   export let data: PageData;
 
-  let showRawMail = false;
-  let showRenderedMail = false;
-
-  function toggleRawMail() {
-    showRawMail = true;
-    showRenderedMail = false;
-  }
+  let showSection = -1;
 
   function toggleRenderedMail() {
-    showRawMail = false;
-    showRenderedMail = true;
+    showSection = 1;
+  }
+
+  function toggleRawMail() {
+    showSection = 2;
+  }
+
+  function toggleSourceMjml() {
+    showSection = 3;
   }
 </script>
 
@@ -23,19 +24,27 @@
   <div class="links">
     <button on:click={toggleRenderedMail} class="button">View Rendered Mail</button>
     <button on:click={toggleRawMail} class="button">View Raw Mail HTML</button>
+    <button on:click={toggleSourceMjml} class="button">View source MJML</button>
   </div>
 
-  {#if showRenderedMail}
+  {#if showSection == 1}
     <div class="rendered-mail-container">
       <h2>Rendered Mail</h2>
       <iframe title="mail" src="/mail" class="rendered-mail-iframe"></iframe>
     </div>
   {/if}
 
-  {#if showRawMail}
+  {#if showSection == 2}
     <div class="raw-mail-container">
       <h2>Raw Mail HTML</h2>
       <pre class="raw-html">{data.rawMailHtml}</pre>
+    </div>
+  {/if}
+
+  {#if showSection == 3}
+    <div class="raw-mail-container">
+      <h2>Source MJML</h2>
+      <pre class="raw-html">{data.sourceMjml}</pre>
     </div>
   {/if}
 </main>

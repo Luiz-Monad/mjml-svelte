@@ -28,7 +28,7 @@
     "vite": "^6.0.3"
   },
   "dependencies": {
-    "mjml-svelte": "file:../"
+    "mjml-svelte": "workspace:.."
   },
   "engines": {
     "node": ">=18.0.0"

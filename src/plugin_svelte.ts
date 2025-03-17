@@ -7,15 +7,16 @@ export const mjmlServerPageLoad = <
   InputData extends Record<string, unknown> | null,
   ParentData extends Record<string, unknown>,
   OutputData extends Record<string, unknown> | void,
-  RouteId extends string | null
+  RouteId extends string | null,
+  Event extends LoadEvent<Params, InputData, ParentData, RouteId>
 >(
   loadBase: Load<Params, InputData, ParentData, OutputData, RouteId>,
   prerenderRoutes: () => string[],
-  getRoute: (data: OutputData) => string
+  getRoute: (event: Event, data: OutputData) => string
 ) => {
-  const load = async (event: LoadEvent<Params, InputData, ParentData, RouteId>) => {
+  const load = async (event: Event) => {
     const data = await loadBase(event);
-    return loadRoute(() => getRoute(data), data);
+    return loadRoute(() => getRoute(event, data), data);
   };
   return loadRoutes(prerenderRoutes, load);
 };
