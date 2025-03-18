@@ -15,6 +15,7 @@ Thumbs.db
 !.env.test
 
 # proj files to ignore formatting
+CHANGELOG.md
 static/
 src/app.html
 test/expected.html

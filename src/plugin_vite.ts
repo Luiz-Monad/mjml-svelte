@@ -109,6 +109,7 @@ export function mjmlPlugin(): Plugin[] {
         }
         const req = requestParser(id);
         if (!req) return;
+        const isSSR = !!viteConfig.build.ssr;
         if (getQueryParam(req.rawQuery, 'mjml')) return;
         const server = viteDevServer ?? (await createServer());
         const loader = (subId: string) =>
@@ -123,7 +124,8 @@ export function mjmlPlugin(): Plugin[] {
             svelteContext,
             sveltePage,
             svelteServer,
-            renderMjmlBody
+            renderMjmlBody,
+            isSSR
           );
           return {
             code: svelteComponent

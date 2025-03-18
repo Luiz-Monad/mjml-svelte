@@ -18,6 +18,7 @@ type PageComponent = { default: typeof SvelteComponent };
 type PageServerComponent = {
   load: PageLoadFn & { _routes: string[] };
   _raw?: boolean;
+  _noCsr?: boolean;
 };
 
 const createPage = (url: URL, data: PageData): Page => ({
@@ -58,12 +59,15 @@ export const mjmlTransformToSvelte = async (
   requestContext: PageComponent,
   sveltePage: PageComponent,
   svelteServer: PageServerComponent,
-  renderMjmlBody: Renderer
+  renderMjmlBody: Renderer,
+  isSSR: boolean
 ) => {
+  const isRaw = !!svelteServer._raw;
+  const isNoCsr = !!svelteServer._noCsr;
+  if (isNoCsr && !isSSR) return '';
   const entries = await Promise.all(
     svelteServer.load._routes.map(async (route) => {
       const url = new URL(route, 'http://host/');
-      const isRaw = !!svelteServer._raw;
       const data = await svelteServer.load({ url });
       const page = createPage(url, data);
       const html = render(requestContext.default, {
