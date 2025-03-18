@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.0.0...v1.1.0) (2025-03-18)
+
+
+### Features
+
+* disable client side rendering ([8a5de90](https://github.com/Luiz-Monad/mjml-svelte/commit/8a5de904ce0a698d39477d199c1a8c3c6fca22e1))
+
 ## 1.0.0 (2025-03-17)
 
 
