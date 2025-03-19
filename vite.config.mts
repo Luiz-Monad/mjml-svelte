@@ -16,7 +16,7 @@ const tgt_components = path.resolve(import.meta.dirname, './dist/components');
 const paths = (source: string) =>
   source.endsWith('.svelte') ? source.replace('$components', './components') : source;
 
-const external = (await glob('*', { cwd: src_components })).map((id) => `$components/${id}`);
+const components = (await glob('*', { cwd: src_components })).map((id) => `$components/${id}`);
 
 export default defineConfig({
   plugins: [
@@ -55,7 +55,7 @@ export default defineConfig({
           paths
         }
       ],
-      external
+      external: [...components, 'html-minifier', 'mjml', 'magic-string']
     }
   },
   resolve: {
