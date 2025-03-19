@@ -28,7 +28,7 @@
   export let title: string | undefined = undefined;
   export let usemap: string | undefined = undefined;
   export let width: string | number | undefined = undefined;
-  export let children: () => any; //non-standard mjml
+  export let children: (() => any) | undefined = undefined; //non-standard mjml
 </script>
 
 <svelte:element
@@ -65,5 +65,7 @@
     width
   }}
 >
-  {@render children()}
+  {#if children}
+    {@render children()}
+  {/if}
 </svelte:element>

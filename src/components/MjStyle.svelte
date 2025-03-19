@@ -1,6 +1,6 @@
 <script lang="ts">
   export let inline: 'inline' | undefined = undefined;
-  export let children: () => any; //raw
+  export let children: (() => any) | undefined = undefined; //raw
 </script>
 
 <svelte:element
@@ -9,5 +9,7 @@
     inline
   }}
 >
-  {@render children()}
+  {#if children}
+    {@render children()}
+  {/if}
 </svelte:element>
