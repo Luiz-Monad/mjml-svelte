@@ -1,4 +1,12 @@
-import { createServer, type Plugin, type ResolvedConfig, type ViteDevServer } from 'vite';
+import {
+  createServer,
+  isCSSRequest,
+  isRunnableDevEnvironment,
+  runnerImport,
+  type Plugin,
+  type ResolvedConfig,
+  type ViteDevServer
+} from 'vite';
 import mjml2html from 'mjml';
 import { minify } from 'html-minifier';
 import MagicString from 'magic-string';
@@ -73,11 +81,64 @@ export function mjmlPlugin(): Plugin[] {
     return normalizedPath.replace(base, '');
   };
 
+  const createLoader = (dependencies: string[]) => async (id: string) => {
+    // experimental API
+    // const imported = await runnerImport(id, {
+    //   plugins: Array.from(
+    //     viteConfig.plugins.filter(
+    //       (p) =>
+    //         !(
+    //           p.name.startsWith('vitest:') ||
+    //           p.name === 'vitest' ||
+    //           p.name.startsWith('vite:') ||
+    //           p.name === 'alias'
+    //         )
+    //     )
+    //   ),
+    //   resolve: viteConfig.environments.ssr.resolve,
+    //   server: {
+    //     // https://github.com/vitejs/vite/issues/19606
+    //     perEnvironmentStartEndDuringDev: true
+    //   }
+    // });
+    // dependencies.push(...imported.dependencies);
+    // return imported.module;
 
+    // if (!viteDevServer) {
+    //   viteDevServer = await createServer();
+    //   viteDevServerClose = true;
+    // }
+    // const ssr = viteDevServer.environments.ssr;
+    // if (!isRunnableDevEnvironment(ssr)) {
+    //   throw new Error(`invalid environment ${ssr.name}`)
+    // }
+    // ssr.runner.evaluatedModules.clear();
+    // const module = await ssr.runner.import(id);
+    // const depMap = ssr.runner.evaluatedModules.urlToIdModuleMap;
+    // dependencies.push(...depMap.values().map(m => m.file));
+    // return module;
+
+    if (!viteDevServer) {
+      viteDevServer = await createServer();
+      viteDevServerClose = true;
+    }
+    const loaded = Array.from(viteDevServer.moduleGraph.urlToModuleMap.keys());
+    const module = viteDevServer.ssrLoadModule(id);
+    const depMap = Array.from(viteDevServer.moduleGraph.urlToModuleMap.values());
+    dependencies.push(
+      ...depMap
+        .map((m) => m.url)
+        .filter(m => !!m)
+        .filter(m => !loaded.includes(m))
+        .filter(m => !dependencies.includes(m))
+    );
+    return module;
+  };
 
   let requestParser: ReturnType<typeof buildIdParser>;
   let viteConfig: ResolvedConfig;
   let viteDevServer: ViteDevServer;
+  let viteDevServerClose = false;
   return [
     {
       name: 'vite-plugin-mjml-transform-pre',
@@ -99,6 +160,10 @@ export function mjmlPlugin(): Plugin[] {
         viteConfig = config;
       },
 
+      configureServer(server) {
+        viteDevServer = server;
+      },
+
       resolveId(id, importer, options) {
         if (id === requestContextSvelte.id) {
           return id;
@@ -113,11 +178,16 @@ export function mjmlPlugin(): Plugin[] {
         if (!req) return;
         if (getQueryParam(req.rawQuery, 'mjml')) return;
         const isSSR = !!options?.ssr;
+        const dependencies: string[] = [];
+        const loader = createLoader(dependencies);
+        const pageLoader = async (pageId: string) => {
+          return await loader(normalizeId(id, pageId));
+        };
           const idPage = appendQueryParam(id, 'mjml', '1');
           const idServer = serverId(idPage);
-          const sveltePage = (await mjmlProcessInclude(loader as any, idPage)) as any;
-          const svelteServer = (await server.ssrLoadModule(idServer)) as any;
-          const svelteContext = (await server.ssrLoadModule(requestContextSvelte.id)) as any;
+        const sveltePage = (await mjmlProcessInclude(pageLoader as any, idPage)) as any;
+        const svelteServer = (await loader(idServer)) as any;
+        const svelteContext = (await loader(requestContextSvelte.id)) as any;
           const svelteComponent = await mjmlTransformToSvelte(
             svelteContext,
             sveltePage,
@@ -128,10 +198,11 @@ export function mjmlPlugin(): Plugin[] {
           return {
             code: svelteComponent
           };
-        } finally {
-          if (!viteDevServer) {
-            await server.close();
-          }
+      },
+
+      async buildEnd() {
+        if (viteDevServerClose) {
+          await viteDevServer.close();
         }
       }
     }
