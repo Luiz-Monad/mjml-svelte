@@ -22,7 +22,23 @@ async function renderMjmlBody(mjmlSvelte: string, isRaw: boolean) {
   return minifiedHtml;
 }
 
+function renderSourceMap(file: string, code: string) {
+  const magicString = new MagicString(code);
+  const map = magicString.generateMap({
+    source: file,
+    file: file,
+    includeContent: true,
+    hires: true
+  });
+  return {
+    code: magicString.toString(),
+    map
+  };
+}
+
 export function mjmlPlugin(): Plugin[] {
+  const serverId = (id: string) => id.replace('.mjml.svelte', '.server.ts');
+
   const buildIdParser = () => {
     const filter = (id: string) => {
       return id.endsWith('.mjml.svelte');
@@ -57,14 +73,14 @@ export function mjmlPlugin(): Plugin[] {
     return normalizedPath.replace(base, '');
   };
 
-  const serverId = (id: string) => id.replace('.mjml.svelte', '.server.ts');
+
 
   let requestParser: ReturnType<typeof buildIdParser>;
   let viteConfig: ResolvedConfig;
   let viteDevServer: ViteDevServer;
   return [
     {
-      name: 'svelte-mjml-transform-pre',
+      name: 'vite-plugin-mjml-transform-pre',
       enforce: 'pre',
 
       async config(config) {
@@ -75,7 +91,7 @@ export function mjmlPlugin(): Plugin[] {
       }
     },
     {
-      name: 'svelte-mjml-transform-post',
+      name: 'vite-plugin-mjml-transform-post',
       enforce: 'post',
 
       async configResolved(config) {
@@ -83,38 +99,20 @@ export function mjmlPlugin(): Plugin[] {
         viteConfig = config;
       },
 
-      configureServer(server) {
-        viteDevServer = server;
-      },
-
-      resolveId(id) {
+      resolveId(id, importer, options) {
         if (id === requestContextSvelte.id) {
           return id;
         }
       },
 
-      async load(id) {
+      async load(id, options) {
         if (id === requestContextSvelte.id) {
-          const magicString = new MagicString(requestContextSvelte.code);
-          const map = magicString.generateMap({
-            source: id,
-            file: id,
-            includeContent: true,
-            hires: true
-          });
-          return {
-            code: magicString.toString(),
-            map
-          };
+          return renderSourceMap(id, requestContextSvelte.code);
         }
         const req = requestParser(id);
         if (!req) return;
-        const isSSR = !!viteConfig.build.ssr;
         if (getQueryParam(req.rawQuery, 'mjml')) return;
-        const server = viteDevServer ?? (await createServer());
-        const loader = (subId: string) =>
-          server.ssrLoadModule(appendQueryParam(normalizeId(id, subId), 'mjml', '1'));
-        try {
+        const isSSR = !!options?.ssr;
           const idPage = appendQueryParam(id, 'mjml', '1');
           const idServer = serverId(idPage);
           const sveltePage = (await mjmlProcessInclude(loader as any, idPage)) as any;
