@@ -6,7 +6,7 @@ import { mjmlPlugin } from '../src/plugin_vite';
 const default_extensions = ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'];
 
 export default defineConfig({
-  plugins: [sveltekit() as PluginOption, mjmlPlugin()],
+  plugins: [sveltekit() as PluginOption, mjmlPlugin() as PluginOption],
   resolve: {
     extensions: ['.mjml.svelte', '.svelte', ...default_extensions],
     alias: {

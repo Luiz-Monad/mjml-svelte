@@ -1,4 +1,5 @@
-import { defineConfig, type PluginOption } from 'vite';
+import { type PluginOption } from 'vite';
+import { defineConfig } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { mjmlPlugin } from 'mjml-svelte/vite';
 

@@ -3,21 +3,33 @@ import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { page } from './setup';
 
-test('renders the +page.mjml.svelte and checks HTML output', async () => {
-  // Navigate to the page where the Svelte component is rendered
-  await page.goto('http://localhost:5080/'); // Adjust the URL as necessary
-
-  // Wait for the component to be rendered
+async function render(route: string) {
+  await page.goto(`http://localhost:5080/${route}`);
   await page.waitForLoadState('domcontentloaded');
+  return await page.content();
+}
 
-  // Get the HTML content of the rendered component
-  const htmlContent = await page.content();
-
-  // Read the expected HTML content from the file
-  const expectedHtmlPath = join(__dirname, 'expected.html');
+async function expected(file: string, htmlContent?: string) {
+  const expectedHtmlPath = join(__dirname, file);
   const expectedHtml = readFileSync(expectedHtmlPath, 'utf-8').trim();
-  // writeFileSync(expectedHtmlPath, htmlContent);
+  // writeFileSync(expectedHtmlPath, htmlContent!);
+  return expectedHtml;
+}
 
-  // Compare the actual HTML content with the expected HTML content
+test('check if rendering works', async () => {
+  const htmlContent = await render('mail');
+  const expectedHtml = await expected('mjml.mail.expected.html', htmlContent);
+  expect(htmlContent).toContain(expectedHtml);
+});
+
+test('check if including mjml works', async () => {
+  const htmlContent = await render('include');
+  const expectedHtml = await expected('mjml.mail.expected.html', htmlContent);
+  expect(htmlContent).toContain(expectedHtml);
+});
+
+test('check if raw debugger works', async () => {
+  const htmlContent = await render('raw');
+  const expectedHtml = await expected('mjml.raw.expected.html', htmlContent);
   expect(htmlContent).toContain(expectedHtml);
 });
