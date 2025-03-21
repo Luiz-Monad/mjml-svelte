@@ -2,7 +2,6 @@ import {
   createServer,
   isCSSRequest,
   isRunnableDevEnvironment,
-  runnerImport,
   type Plugin,
   type ResolvedConfig,
   type ViteDevServer
@@ -44,6 +43,48 @@ function renderSourceMap(file: string, code: string) {
   };
 }
 
+function createLoader(vite?: ViteDevServer) {
+  let needClose = false;
+  let dependencies: string[] = [];
+  return {
+    dependencies,
+    loader: async (id: string) => {
+      if (!vite) {
+        vite = await createServer({
+          configLoader: 'runner',
+          server: {
+            // https://github.com/vitejs/vite/issues/19606
+            perEnvironmentStartEndDuringDev: true,
+            middlewareMode: true,
+            ws: false
+          },
+        });
+        needClose = true;
+      }
+      const ssr = vite.environments.ssr;
+      if (!isRunnableDevEnvironment(ssr)) {
+        throw new Error(`no runnable dev env was found`);
+      }
+      const depMap = ssr.runner.evaluatedModules.urlToIdModuleMap;
+      const loaded = Array.from(depMap.keys());
+      const module = await ssr.runner.import(id);
+      dependencies.push(
+        ...Array.from(depMap.values())
+          .map((m) => m.url)
+          .filter(m => !!m)
+          .filter(m => !loaded.includes(m))
+          .filter(m => !dependencies.includes(m))
+      );
+      return module;
+    },
+    closeLoader: async () => {
+      if (needClose && vite) {
+        await vite.close();
+      }
+    }
+  };
+};
+
 export function mjmlPlugin(): Plugin[] {
   const serverId = (id: string) => id.replace('.mjml.svelte', '.server.ts');
 
@@ -81,64 +122,9 @@ export function mjmlPlugin(): Plugin[] {
     return normalizedPath.replace(base, '');
   };
 
-  const createLoader = (dependencies: string[]) => async (id: string) => {
-    // experimental API
-    // const imported = await runnerImport(id, {
-    //   plugins: Array.from(
-    //     viteConfig.plugins.filter(
-    //       (p) =>
-    //         !(
-    //           p.name.startsWith('vitest:') ||
-    //           p.name === 'vitest' ||
-    //           p.name.startsWith('vite:') ||
-    //           p.name === 'alias'
-    //         )
-    //     )
-    //   ),
-    //   resolve: viteConfig.environments.ssr.resolve,
-    //   server: {
-    //     // https://github.com/vitejs/vite/issues/19606
-    //     perEnvironmentStartEndDuringDev: true
-    //   }
-    // });
-    // dependencies.push(...imported.dependencies);
-    // return imported.module;
-
-    // if (!viteDevServer) {
-    //   viteDevServer = await createServer();
-    //   viteDevServerClose = true;
-    // }
-    // const ssr = viteDevServer.environments.ssr;
-    // if (!isRunnableDevEnvironment(ssr)) {
-    //   throw new Error(`invalid environment ${ssr.name}`)
-    // }
-    // ssr.runner.evaluatedModules.clear();
-    // const module = await ssr.runner.import(id);
-    // const depMap = ssr.runner.evaluatedModules.urlToIdModuleMap;
-    // dependencies.push(...depMap.values().map(m => m.file));
-    // return module;
-
-    if (!viteDevServer) {
-      viteDevServer = await createServer();
-      viteDevServerClose = true;
-    }
-    const loaded = Array.from(viteDevServer.moduleGraph.urlToModuleMap.keys());
-    const module = viteDevServer.ssrLoadModule(id);
-    const depMap = Array.from(viteDevServer.moduleGraph.urlToModuleMap.values());
-    dependencies.push(
-      ...depMap
-        .map((m) => m.url)
-        .filter(m => !!m)
-        .filter(m => !loaded.includes(m))
-        .filter(m => !dependencies.includes(m))
-    );
-    return module;
-  };
-
   let requestParser: ReturnType<typeof buildIdParser>;
   let viteConfig: ResolvedConfig;
   let viteDevServer: ViteDevServer;
-  let viteDevServerClose = false;
   return [
     {
       name: 'vite-plugin-mjml-transform-pre',
@@ -178,10 +164,10 @@ export function mjmlPlugin(): Plugin[] {
         if (!req) return;
         if (getQueryParam(req.rawQuery, 'mjml')) return;
         const isSSR = !!options?.ssr;
-        const dependencies: string[] = [];
-        const loader = createLoader(dependencies);
+        const { loader, closeLoader, dependencies } = createLoader(viteDevServer);
+        try {
         const pageLoader = async (pageId: string) => {
-          return await loader(normalizeId(id, pageId));
+            return await loader(appendQueryParam(normalizeId(id, pageId), 'mjml', '1'));
         };
           const idPage = appendQueryParam(id, 'mjml', '1');
           const idServer = serverId(idPage);
@@ -198,11 +184,8 @@ export function mjmlPlugin(): Plugin[] {
           return {
             code: svelteComponent
           };
-      },
-
-      async buildEnd() {
-        if (viteDevServerClose) {
-          await viteDevServer.close();
+        } finally {
+          await closeLoader();
         }
       }
     }
