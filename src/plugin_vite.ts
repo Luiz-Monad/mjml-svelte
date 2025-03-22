@@ -2,6 +2,7 @@ import {
   createServer,
   isCSSRequest,
   isRunnableDevEnvironment,
+  type InlineConfig,
   type Plugin,
   type ResolvedConfig,
   type ViteDevServer
@@ -43,14 +44,15 @@ function renderSourceMap(file: string, code: string) {
   };
 }
 
-function createLoader(vite?: ViteDevServer) {
+function createLoader({ vite, config }: { vite?: ViteDevServer, config?: InlineConfig }) {
+  let server = vite;
   let needClose = false;
   let dependencies: string[] = [];
   return {
     dependencies,
     loader: async (id: string) => {
-      if (!vite) {
-        vite = await createServer({
+      if (!server) {
+        server = await createServer({
           configLoader: 'runner',
           server: {
             // https://github.com/vitejs/vite/issues/19606
@@ -58,10 +60,11 @@ function createLoader(vite?: ViteDevServer) {
             middlewareMode: true,
             ws: false
           },
+          ...config
         });
         needClose = true;
       }
-      const ssr = vite.environments.ssr;
+      const ssr = server.environments.ssr;
       if (!isRunnableDevEnvironment(ssr)) {
         throw new Error(`no runnable dev env was found`);
       }
@@ -69,11 +72,12 @@ function createLoader(vite?: ViteDevServer) {
       const loaded = Array.from(depMap.keys());
       const module = await ssr.runner.import(id);
       dependencies.push(
-        ...Array.from(depMap.values())
-          .map((m) => m.url)
-          .filter(m => !!m)
-          .filter(m => !loaded.includes(m))
-          .filter(m => !dependencies.includes(m))
+        ...Array.from(depMap.keys())
+          .filter((m) => !loaded.includes(m))
+          .map((m) => depMap.get(m))
+          .filter((m) => !!m)
+          .map((m) => m.id)
+          .filter((m) => !dependencies.includes(m))
       );
       return module;
     },
@@ -88,38 +92,8 @@ function createLoader(vite?: ViteDevServer) {
 export function mjmlPlugin(): Plugin[] {
   const serverId = (id: string) => id.replace('.mjml.svelte', '.server.ts');
 
-  const buildIdParser = () => {
-    const filter = (id: string) => {
+  const filterId = (id) => {
       return id.endsWith('.mjml.svelte');
-    };
-    const splitId = (id: string) => {
-      const [filename, rawQuery] = id.split('?', 2);
-      return { filename, rawQuery: rawQuery || '' };
-    };
-    return (id: string) => {
-      const { filename, rawQuery } = splitId(id);
-      if (filter(filename)) {
-        return { id, filename, rawQuery };
-      }
-    };
-  };
-
-  const base = 'http://host';
-
-  const appendQueryParam = (url: string, param: string, value: string) => {
-    const parsedUrl = new URL(url, base);
-    parsedUrl.searchParams.set(param, value);
-    return parsedUrl.toString().replace(base, '');
-  };
-
-  const getQueryParam = (query: string, param: string) => {
-    const urlParams = new URLSearchParams(query);
-    return urlParams.has(param) ? urlParams.get(param) : null;
-  };
-
-  const normalizeId = (baseId: string, id: string) => {
-    const normalizedPath = new URL(id, new URL(baseId, base)).href;
-    return normalizedPath.replace(base, '');
   };
 
   let requestParser: ReturnType<typeof buildIdParser>;
@@ -127,7 +101,7 @@ export function mjmlPlugin(): Plugin[] {
   let viteDevServer: ViteDevServer;
   return [
     {
-      name: 'vite-plugin-mjml-transform-pre',
+      name: 'vite-plugin-mjml-config',
       enforce: 'pre',
 
       async config(config) {
@@ -138,11 +112,12 @@ export function mjmlPlugin(): Plugin[] {
       }
     },
     {
-      name: 'vite-plugin-mjml-transform-post',
+      name: 'vite-plugin-mjml-transform',
       enforce: 'post',
+      sharedDuringBuild: true,
 
       async configResolved(config) {
-        requestParser = buildIdParser();
+        requestParser = buildIdParser(filterId);
         viteConfig = config;
       },
 
@@ -161,14 +136,12 @@ export function mjmlPlugin(): Plugin[] {
           return renderSourceMap(id, requestContextSvelte.code);
         }
         const req = requestParser(id);
-        if (!req) return;
-        if (getQueryParam(req.rawQuery, 'mjml')) return;
+        if (!req || getQueryParam(req.rawQuery, 'mjml')) return;
         const isSSR = !!options?.ssr;
-        const { loader, closeLoader, dependencies } = createLoader(viteDevServer);
+        const { loader, closeLoader, dependencies } = createLoader({ vite: viteDevServer });
         try {
-        const pageLoader = async (pageId: string) => {
-            return await loader(appendQueryParam(normalizeId(id, pageId), 'mjml', '1'));
-        };
+          const pageLoader = async (pageId: string) =>
+            await loader(appendQueryParam(normalizeId(id, pageId), 'mjml', '1'));
           const idPage = appendQueryParam(id, 'mjml', '1');
           const idServer = serverId(idPage);
         const sveltePage = (await mjmlProcessInclude(pageLoader as any, idPage)) as any;
