@@ -76,7 +76,7 @@ function renderSourceMap(file: string, code: string) {
 function createLoader({ vite, config }: { vite?: ViteDevServer; config?: InlineConfig }) {
   let server = vite;
   let needClose = false;
-  let dependencies: string[] = [];
+  const dependencies: string[] = [];
   return {
     dependencies,
     loader: async (id: string) => {

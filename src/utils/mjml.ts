@@ -1,6 +1,6 @@
 import { ElementType, parseDocument } from 'htmlparser2';
 import { render } from 'dom-serializer';
-import { Node, Element, Document, Text, isTag } from 'domhandler';
+import { type Node, Element, type Document, Text, isTag } from 'domhandler';
 
 export type XmlDocument = Document;
 
