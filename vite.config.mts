@@ -7,6 +7,8 @@ import { packagePlugin } from './vite-package.mts';
 import autoExternal from 'rollup-plugin-auto-external';
 import glob from 'fast-glob';
 
+import pkg from './package.json';
+
 const src_components = path
   .resolve(import.meta.dirname, './src/components')
   .replaceAll(path.sep, path.posix.sep);
@@ -17,6 +19,8 @@ const paths = (source: string) =>
   source.endsWith('.svelte') ? source.replace('$components', './components') : source;
 
 const components = (await glob('*', { cwd: src_components })).map((id) => `$components/${id}`);
+
+const external = Object.keys(pkg.dependencies);
 
 export default defineConfig({
   plugins: [
@@ -55,7 +59,7 @@ export default defineConfig({
           paths
         }
       ],
-      external: [...components, 'html-minifier', 'mjml', 'magic-string']
+      external: [...components, ...external]
     }
   },
   resolve: {
