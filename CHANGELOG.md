@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.2.0](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.1.0...v1.2.0) (2025-03-24)
+
+
+### Features
+
+* implemented importing css styles ([dbd0ffd](https://github.com/Luiz-Monad/mjml-svelte/commit/dbd0ffdbc97685b24a6e051cefd188effe5d57ca))
+
+
+### Bug Fixes
+
+* added missing tests ([5f2e007](https://github.com/Luiz-Monad/mjml-svelte/commit/5f2e00772a1f764efda6ccbb45936074e3b905d8))
+* don't bundle external deps ([5039b76](https://github.com/Luiz-Monad/mjml-svelte/commit/5039b760afc2a551b7d23177dccfac6319a84518))
+* optional children ([e7d6f09](https://github.com/Luiz-Monad/mjml-svelte/commit/e7d6f09aa9eb6ef41824a25eec39ab0f8aee56c9))
+* removed peer deps from build ([ac1012c](https://github.com/Luiz-Monad/mjml-svelte/commit/ac1012cd9d7a276b5c7af85378eb0e67e6210326))
+* replaced vite ssr mod loader ([404e35b](https://github.com/Luiz-Monad/mjml-svelte/commit/404e35be1d495f0f4eafa473702025af93ce6e1d))
+
 ## [1.1.0](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.0.0...v1.1.0) (2025-03-18)
 
 
