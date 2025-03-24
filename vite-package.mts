@@ -1,5 +1,4 @@
 import { spawn } from 'node:child_process';
-import { promisify } from 'node:util';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { Plugin } from 'vite';
@@ -43,13 +42,30 @@ export function packagePlugin(input: string, output: string, root: string = '.')
       name: 'package-plugin',
       apply: 'build',
       closeBundle: async function () {
-        const exec = promisify(spawn);
         try {
           this.info('Copying Svelte components');
-          await exec('svelte-package', ['--input', input, '--output', output], {
-            stdio: 'inherit',
+          const proc = spawn('svelte-package', ['--input', input, '--output', output], {
+            stdio: 'pipe',
             shell: true
           });
+          Promise.all([
+            async () => {
+              for await (const data of proc.stdout) {
+                this.info(data);
+              }
+            },
+            async () => {
+              for await (const data of proc.stderr) {
+                this.warn(data);
+              }
+            },
+            new Promise((success, error) => {
+              proc.once('exit', (code) => {
+                if (code) error(code)
+                else success(code);
+              });
+            })
+          ]);
         } catch (err) {
           this.error(`Failed to run svelte-package: ${err}`);
         }
