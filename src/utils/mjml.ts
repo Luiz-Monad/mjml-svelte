@@ -1,39 +1,43 @@
-import type { MJMLJsonObject, MJMLJsonWithChildren, MJMLJsonWithContent } from 'mjml-core';
+import { ElementType, parseDocument } from 'htmlparser2';
+import { render } from 'dom-serializer';
+import { Node, Element, Document, Text, isTag } from 'domhandler';
 
-export function jsonToMjml(obj: MJMLJsonObject) {
-  const { tagName, attributes } = obj;
-  const { children } = isJsonChildren(obj) ? obj : {};
-  const { content } = isJsonContent(obj) ? obj : {};
-  const subNode =
-    children && children.length > 0 ? children.map(jsonToMjml).join('\n') : content || '';
-  const stringAttrs = Object.keys(attributes)
-    .map((attr) => `${attr}="${attributes[attr]}"`)
-    .join(' ');
-  return `<${tagName}${stringAttrs === '' ? '>' : ` ${stringAttrs}>`}${subNode}</${tagName}>`;
+export type XmlDocument = Document;
+
+export function stringToXml(str: string): Document {
+  return parseDocument(str);
 }
 
-export function isJsonChildren(obj: MJMLJsonObject): obj is MJMLJsonWithChildren {
-  return (obj as MJMLJsonWithChildren).children !== undefined;
+export function xmlToString(node?: Document): string {
+  return node ? render(node) : '';
 }
 
-export function isJsonContent(obj: MJMLJsonObject): obj is MJMLJsonWithContent {
-  return (obj as MJMLJsonWithChildren).children !== undefined;
+export function isElement(node: Node): node is Element {
+  return isTag(node);
 }
 
-export function findChildByTagName(parent: MJMLJsonWithChildren, tagName: string) {
-  return parent.children.find((child) => child.tagName === tagName);
+export function findChildByTagName(parent: Element, tagName: string): Element | undefined {
+  return parent.children.find(
+    (child): child is Element => isElement(child) && child.tagName === tagName
+  );
 }
 
-export function createChildTag(parent: MJMLJsonObject, tagName: string) {
-  const newTag: MJMLJsonObject = {
-    tagName,
-    attributes: {}
-  };
-  const withChild = parent as MJMLJsonWithChildren;
-  withChild.children = [newTag, ...(withChild.children ?? [])];
-  return newTag;
+export function createChildTag(parent: Element, tagName: string): Element {
+  const newElement = new Element(tagName, {}, [], ElementType.Tag);
+  parent.children.push(newElement);
+  return newElement;
 }
 
-export function getOrCreateChildTag(parent: MJMLJsonWithChildren, tagName: string) {
-  return findChildByTagName(parent, tagName) ?? createChildTag(parent, tagName);
+export function createChildText(parent: Element, text: string): Text {
+  const textNode = new Text(text);
+  parent.children.push(textNode);
+  return textNode;
+}
+
+export function getOrCreateChildTag(parent: Element, tagName: string): Element {
+  const existingChild = findChildByTagName(parent, tagName);
+  if (existingChild) {
+    return existingChild;
+  }
+  return createChildTag(parent, tagName);
 }

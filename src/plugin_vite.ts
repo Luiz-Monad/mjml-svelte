@@ -12,11 +12,40 @@ import { minify } from 'html-minifier';
 import MagicString from 'magic-string';
 
 import { mjmlProcessInclude, mjmlTransformToSvelte, requestContextSvelte } from './plugin_base';
+import {
+  createChildTag,
+  createChildText,
+  getOrCreateChildTag,
+  isElement,
+  stringToXml,
+  xmlToString,
+  type XmlDocument
+} from './utils/mjml';
+import {
+  appendQueryParam,
+  buildIdParser,
+  getQueryParam,
+  getVirtualRawQuery,
+  normalizeId,
+  removeQueryParams
+} from './utils/request_id';
 
-async function renderMjmlBody(mjmlSvelte: string, isRaw: boolean) {
+function injectStyles(mjmlXml: XmlDocument, cssStyles: string[]): XmlDocument {
+  const mjml = mjmlXml.firstChild;
+  if (!mjml || !isElement(mjml) || mjml.tagName !== 'mjml') return mjmlXml ?? undefined;
+  const mjHead = getOrCreateChildTag(mjml, 'mj-head');
+  for (const style of cssStyles) {
+    const mjStyle = createChildTag(mjHead, 'mj-style');
+    createChildText(mjStyle, style);
+  }
+  return mjmlXml;
+}
+
+async function renderMjmlBody(mjmlSvelte: string, cssStyles: string[], isRaw: boolean) {
   const mjmlTerse = minify(mjmlSvelte, { removeComments: true, collapseWhitespace: true });
-  if (isRaw) return mjmlTerse;
-  const mjmlMail = mjml2html(mjmlTerse, {
+  const mjmlJson = xmlToString(injectStyles(stringToXml(mjmlTerse), cssStyles));
+  if (isRaw) return mjmlJson;
+  const mjmlMail = mjml2html(mjmlJson, {
     fonts: {}
   });
   const minifiedHtml = minify(mjmlMail.html, {
@@ -44,7 +73,7 @@ function renderSourceMap(file: string, code: string) {
   };
 }
 
-function createLoader({ vite, config }: { vite?: ViteDevServer, config?: InlineConfig }) {
+function createLoader({ vite, config }: { vite?: ViteDevServer; config?: InlineConfig }) {
   let server = vite;
   let needClose = false;
   let dependencies: string[] = [];
@@ -87,16 +116,18 @@ function createLoader({ vite, config }: { vite?: ViteDevServer, config?: InlineC
       }
     }
   };
-};
+}
 
 export function mjmlPlugin(): Plugin[] {
   const serverId = (id: string) => id.replace('.mjml.svelte', '.server.ts');
+  const cssRequestId = 'virtual:__mjml_svelte_style';
 
   const filterId = (id) => {
-      return id.endsWith('.mjml.svelte');
+    return id.endsWith('.mjml.svelte');
   };
 
   let requestParser: ReturnType<typeof buildIdParser>;
+  let requestParserCss: ReturnType<typeof buildIdParser>;
   let viteConfig: ResolvedConfig;
   let viteDevServer: ViteDevServer;
   return [
@@ -118,6 +149,7 @@ export function mjmlPlugin(): Plugin[] {
 
       async configResolved(config) {
         requestParser = buildIdParser(filterId);
+        requestParserCss = buildIdParser(isCSSRequest);
         viteConfig = config;
       },
 
@@ -144,18 +176,47 @@ export function mjmlPlugin(): Plugin[] {
             await loader(appendQueryParam(normalizeId(id, pageId), 'mjml', '1'));
           const idPage = appendQueryParam(id, 'mjml', '1');
           const idServer = serverId(idPage);
-        const sveltePage = (await mjmlProcessInclude(pageLoader as any, idPage)) as any;
-        const svelteServer = (await loader(idServer)) as any;
-        const svelteContext = (await loader(requestContextSvelte.id)) as any;
+          const sveltePage = (await mjmlProcessInclude(pageLoader as any, idPage)) as any;
+          const svelteServer = (await loader(idServer)) as any;
+          const svelteContext = (await loader(requestContextSvelte.id)) as any;
+          const svelteStyles = await Promise.all(dependencies.filter(isCSSRequest).map(pageLoader));
           const svelteComponent = await mjmlTransformToSvelte(
             svelteContext,
             sveltePage,
             svelteServer,
+            svelteStyles,
             renderMjmlBody,
             isSSR
           );
           return {
             code: svelteComponent
+          };
+        } finally {
+          await closeLoader();
+        }
+      }
+    },
+    {
+      name: 'vite-plugin-mjml-style',
+      enforce: 'pre',
+
+      resolveId(id, importer, options) {
+        const req = requestParserCss(id);
+        if (!req || !getQueryParam(req.rawQuery, 'mjml')) return;
+        const idCss = Buffer.from(removeQueryParams(id)).toString('base64');
+        return appendQueryParam(cssRequestId, 'idCss', idCss);
+      },
+
+      async load(id, options) {
+        if (!id.startsWith(cssRequestId)) return;
+        const idCssB64 = getQueryParam(getVirtualRawQuery(id), 'idCss');
+        if (!idCssB64) return;
+        const idCss = Buffer.from(idCssB64, 'base64').toString();
+        const { loader, closeLoader } = createLoader({});
+        try {
+          const css = await loader(appendQueryParam(idCss, 'inline', ''));
+          return {
+            code: `export default ${JSON.stringify(css.default)}`
           };
         } finally {
           await closeLoader();

@@ -9,8 +9,8 @@ async function render(route: string) {
   return await page.content();
 }
 
-async function expected(file: string, htmlContent?: string) {
-  const expectedHtmlPath = join(__dirname, file);
+async function expected(route: string, htmlContent?: string) {
+  const expectedHtmlPath = join(__dirname, `mjml.${route}.expected.html`);
   const expectedHtml = readFileSync(expectedHtmlPath, 'utf-8').trim();
   // writeFileSync(expectedHtmlPath, htmlContent!);
   return expectedHtml;
@@ -18,18 +18,24 @@ async function expected(file: string, htmlContent?: string) {
 
 test('check if rendering works', async () => {
   const htmlContent = await render('mail');
-  const expectedHtml = await expected('mjml.mail.expected.html', htmlContent);
+  const expectedHtml = await expected('mail', htmlContent);
   expect(htmlContent).toContain(expectedHtml);
 });
 
 test('check if including mjml works', async () => {
   const htmlContent = await render('include');
-  const expectedHtml = await expected('mjml.mail.expected.html', htmlContent);
+  const expectedHtml = await expected('mail', htmlContent);
   expect(htmlContent).toContain(expectedHtml);
 });
 
 test('check if raw debugger works', async () => {
   const htmlContent = await render('raw');
-  const expectedHtml = await expected('mjml.raw.expected.html', htmlContent);
+  const expectedHtml = await expected('raw', htmlContent);
+  expect(htmlContent).toContain(expectedHtml);
+});
+
+test('check if imported css rendering works', async () => {
+  const htmlContent = await render('css');
+  const expectedHtml = await expected('css', htmlContent);
   expect(htmlContent).toContain(expectedHtml);
 });
