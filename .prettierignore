@@ -18,7 +18,7 @@ Thumbs.db
 CHANGELOG.md
 static/
 src/app.html
-test/*.expected.html
+expected.html
 
 # Ignore files for PNPM, NPM and YARN
 pnpm-lock.yaml
