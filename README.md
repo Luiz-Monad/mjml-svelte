@@ -2,6 +2,46 @@
 
 This project allows using [MJML](https://mjml.io/) with [SvelteKit](https://kit.svelte.dev/) to create responsive email templates. It allows to integrate MJML elements with Svelte components and render them on the server.
 
+Principle of operation:
+
+```
+┌─────────────────────────┐
+│  MJML Svelte Template   │  Preprocess CSS
+│  (+page.mjml.svelte)    │  Preprocess includes
+└───────────┬─────────────┘
+            │
+            │ Render to MJML XML
+            ▼
+┌─────────────────────────┐
+│      MJML XML Output    │
+│        (.mjml)          │
+└───────────┬─────────────┘
+            │
+            │ Process with MJML Engine
+            ▼
+┌─────────────────────────┐
+│      HTML Output        │  Minified HTML/CSS
+│        (.html)          │
+└───────────┬─────────────┘
+            │
+            │ Embed in Svelte Page
+            │ using @html clause
+            ▼
+┌─────────────────────────┐
+│  Svelte Rendered Page   │  Only this code is
+│     (+page.svelte)      │  include in the final app
+└─────────────────────────┘
+            │
+            │ Strips the outside 'app.html'
+            │ template, leaving the content
+            | in %sveltekit.body% only
+            ▼
+┌─────────────────────────┐
+│     Request Handler     │
+│    (hooks.server.ts)    │
+└─────────────────────────┘
+```
+
 ## Features
 
 - **MJML Integration**: Use MJML components within Svelte to design responsive emails.
@@ -23,7 +63,7 @@ $ pnpm install mjml-svelte
 
 ## Configuration
 
-1. **Add the MJML Plugin to Vite Configuration:**
+1. **Vite config:**
 
    Update your `vite.config.ts` to include the MJML plugin:
 
@@ -41,9 +81,9 @@ $ pnpm install mjml-svelte
    });
    ```
 
-2. **Create a Server Hook:**
+2. **Server Hook:**
 
-   Create a `hooks.server.ts` file to handle requests:
+   Create a `hooks.server.ts` file to handle requests for MJML pages outside the Kit, otherwise the Kit will embed the HTML output inside its _app.html_ template.
 
    ```typescript
    // hooks.server.ts
@@ -57,7 +97,25 @@ $ pnpm install mjml-svelte
    export const handle = sequence(requestHandler, mjmlHandler);
    ```
 
-3. **Create an MJML Svelte Page:**
+3. **Svelte config:**
+
+   Add the supported svelte extensions to `svelte.config.js` to use the MJML files, otherwise SvelteKit will complain about invalid file name in the project.
+
+   ```js
+   // svelte.config.js
+   import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+
+   /** @type {import('@sveltejs/kit').Config} */
+   const config = {
+     extensions: ['.mjml.svelte', '.svelte'],
+     kit: {
+       // your config
+     }
+   };
+   export default config;
+   ```
+
+4. **MJML Svelte Page:**
 
    Create a file named `+page.mjml.svelte` to use the MJML renderer:
 
@@ -77,24 +135,28 @@ $ pnpm install mjml-svelte
    </Mjml>
    ```
 
-4. **Configure Server-Side Rendering:**
+5. **Server-Side Rendering:**
 
-   Configure server-side rendering in `+page.server.ts`:
+   Configure server-side rendering in `+page.server.ts`. This allows you to provide data at runtime (when processing request) to the template engine before the MJML in actually rendered. I'll be available in `page.data` in the `+page.mjml.svelte` template. You can also selectively output different templates based on data in a store, for ex, locale set in the **requestHandler**.
 
    ```typescript
    // +page.server.ts
    import { mjmlServerPageLoad } from 'mjml-svelte/svelte';
 
+   // disables rendering the mail to the client-side in production, bundle size.
+   export const _noCsr = !import.meta.env.DEV;
+   // export const _raw = true; //for debug
+
    export const load = mjmlServerPageLoad(
-     () => ({ title: 'mail-test' }),
-     () => ['/'],
-     (data) => '/'
+     (event) => ({ title: 'mail-test' }),
+     () => ['/', '/en'],
+     (event, data) => event.locals.locale
    );
    ```
 
-5. **Disable Client-Side Rendering if Not Needed:**
+6. **Client-Side Rendering:**
 
-   If you don't need Svelte on the mail body itself, remove CSR in `+page.ts`:
+   You usually don't need SvelteKit client-side code on the mail body itself, remove CSR in `+page.ts`:
 
    ```typescript
    // +page.ts
