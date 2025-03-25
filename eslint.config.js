@@ -17,7 +17,7 @@ export default [
     }
   },
   {
-    ignores: ['.svelte-kit/', 'build/', 'dist/', 'example/.svelte-kit/']
+    ignores: ['.svelte-kit/', 'build/', 'dist/', 'example/.svelte-kit/', 'test/.svelte-kit/']
   },
   {
     rules: {
