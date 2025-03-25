@@ -10,7 +10,7 @@ async function render(route: string) {
 }
 
 async function expected(route: string, htmlContent?: string) {
-  const expectedHtmlPath = join(__dirname, `mjml.${route}.expected.html`);
+  const expectedHtmlPath = join(__dirname, `/src/routes/${route}/expected.html`);
   const expectedHtml = readFileSync(expectedHtmlPath, 'utf-8').trim();
   // writeFileSync(expectedHtmlPath, htmlContent!);
   return expectedHtml;
@@ -24,7 +24,7 @@ test('check if rendering works', async () => {
 
 test('check if including mjml works', async () => {
   const htmlContent = await render('include');
-  const expectedHtml = await expected('mail', htmlContent);
+  const expectedHtml = await expected('include', htmlContent);
   expect(htmlContent).toContain(expectedHtml);
 });
 

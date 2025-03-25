@@ -15,8 +15,12 @@ import { mjmlProcessInclude, mjmlTransformToSvelte, requestContextSvelte } from 
 import {
   createChildTag,
   createChildText,
+  findChildByTagName,
+  findOneByTagName,
   getOrCreateChildTag,
   isElement,
+  moveAllChild,
+  removeChild,
   stringToXml,
   xmlToString,
   type XmlDocument
@@ -33,10 +37,18 @@ import {
 function injectStyles(mjmlXml: XmlDocument, cssStyles: string[]): XmlDocument {
   const mjml = mjmlXml.firstChild;
   if (!mjml || !isElement(mjml) || mjml.tagName !== 'mjml') return mjmlXml ?? undefined;
+  const mjStyles = findChildByTagName(mjml, 'mj-style');
+  for (const style of mjStyles) {
+    const subStyle = findOneByTagName(style, 'style');
+    if (subStyle) {
+      moveAllChild(subStyle, style);
+      removeChild(style, subStyle);
+    }
+  }
   const mjHead = getOrCreateChildTag(mjml, 'mj-head');
   for (const style of cssStyles) {
     const mjStyle = createChildTag(mjHead, 'mj-style');
-    createChildText(mjStyle, style);
+    createChildText(mjStyle, style.replaceAll('\r\n', '\n'));
   }
   return mjmlXml;
 }
