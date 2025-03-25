@@ -34,8 +34,14 @@ test('check if raw debugger works', async () => {
   expect(htmlContent).toContain(expectedHtml);
 });
 
-test('check if imported css rendering works', async () => {
+test('check if imported css on script rendering works', async () => {
   const htmlContent = await render('css');
   const expectedHtml = await expected('css', htmlContent);
+  expect(htmlContent).toContain(expectedHtml);
+});
+
+test('check if imported css on style rendering works', async () => {
+  const htmlContent = await render('css_import');
+  const expectedHtml = await expected('css_import', htmlContent);
   expect(htmlContent).toContain(expectedHtml);
 });
