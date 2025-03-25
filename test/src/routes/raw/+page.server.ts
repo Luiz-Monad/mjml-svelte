@@ -5,5 +5,5 @@ export const _raw = true;
 export const load = mjmlServerPageLoad(
   () => ({ title: 'mail-test' }),
   () => ['/'],
-  (data) => '/'
+  () => '/'
 );

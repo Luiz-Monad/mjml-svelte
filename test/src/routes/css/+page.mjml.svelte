@@ -6,7 +6,6 @@
     MjHead,
     Mjml,
     MjSection,
-    MjStyle,
     MjTable,
     MjText,
     MjTitle,
