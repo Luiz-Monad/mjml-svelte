@@ -1,6 +1,9 @@
-// default used by svelte-kit sync
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { mjmlPreprocess } from '../src/plugin_config.ts';
+
 /** @type {import('@sveltejs/kit').Config} */
-const defaultConfig = {
+const config = {
+  preprocess: [mjmlPreprocess(vitePreprocess())],
   extensions: ['.mjml.svelte', '.svelte'],
   kit: {
     alias: {
@@ -10,4 +13,5 @@ const defaultConfig = {
     }
   }
 };
-export default globalThis.svelteConfig ?? defaultConfig;
+
+export default config;

@@ -123,8 +123,8 @@ function createLoader({ vite, config }: { vite?: ViteDevServer; config?: InlineC
       return module;
     },
     closeLoader: async () => {
-      if (needClose && vite) {
-        await vite.close();
+      if (needClose && server) {
+        await server.close();
       }
     }
   };
