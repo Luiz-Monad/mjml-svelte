@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { PageData } from './$types';
+  import { page } from '$app/state';
 
-  export let data: PageData;
+  const { data } = page;
 
-  let showSection = -1;
+  let showSection = $state(-1);
 
   function toggleRenderedMail() {
     showSection = 1;
@@ -22,9 +22,9 @@
   <h1>Mail Viewer</h1>
 
   <div class="links">
-    <button on:click={toggleRenderedMail} class="button">View Rendered Mail</button>
-    <button on:click={toggleRawMail} class="button">View Raw Mail HTML</button>
-    <button on:click={toggleSourceMjml} class="button">View source MJML</button>
+    <button onclick={toggleRenderedMail} class="button">View Rendered Mail</button>
+    <button onclick={toggleRawMail} class="button">View Raw Mail HTML</button>
+    <button onclick={toggleSourceMjml} class="button">View source MJML</button>
   </div>
 
   {#if showSection == 1}
