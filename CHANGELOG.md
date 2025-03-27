@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.3.0](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.2.0...v1.3.0) (2025-03-27)
+
+
+### Features
+
+* implemented hotreload ([94eacaa](https://github.com/Luiz-Monad/mjml-svelte/commit/94eacaad0cc1b8fcfd7b851f8f2239a9bced7ce0))
+
+
+### Bug Fixes
+
+* added mjml processor logs ([904548f](https://github.com/Luiz-Monad/mjml-svelte/commit/904548f22225a25a5b48b9ac4bef86d5b8c389eb))
+* combine tag style inside mj-style ([b79923c](https://github.com/Luiz-Monad/mjml-svelte/commit/b79923cc01bfb326a242df3ccd179d61d31d6fc1))
+* docs ([bc1a56c](https://github.com/Luiz-Monad/mjml-svelte/commit/bc1a56cd3a162d23f70fe25ebbca494551dfdd2f))
+* sample ([0fd78ae](https://github.com/Luiz-Monad/mjml-svelte/commit/0fd78ae922fcb93a0c72c6851eb5b016f760d4e1))
+* server closing ([a66c1bc](https://github.com/Luiz-Monad/mjml-svelte/commit/a66c1bcfa4d126fe8cd444db85a2193946fe4f08))
+* style preprocessing ([e9c4d85](https://github.com/Luiz-Monad/mjml-svelte/commit/e9c4d859f5e245a29fb3d113ef17d98cdbdb2813))
+
 ## [1.2.0](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.1.0...v1.2.0) (2025-03-24)
 
 
