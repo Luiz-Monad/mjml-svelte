@@ -35,6 +35,7 @@ export default defineConfig({
     lib: {
       entry: {
         index: './src/index.ts',
+        plugin_config: './src/plugin_config.ts',
         plugin_vite: './src/plugin_vite.ts',
         plugin_svelte: './src/plugin_svelte.ts'
       }

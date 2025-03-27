@@ -2,6 +2,9 @@ import type { Page } from '@sveltejs/kit';
 import type { SvelteComponent } from 'svelte';
 import { render } from 'svelte/server';
 import { URL } from 'url';
+import { createChildText, getText, stringToHtml, htmlToString } from './utils/dom';
+
+export const extension = '.mjml.svelte';
 
 const tag_start = '%%MJML_START%%';
 const tag_end = '%%MJML_END%%';
@@ -99,13 +102,38 @@ export const mjmlTransformToSvelte = async (
     ${entries.map(
       ({ route, raw }) => `
     {#if _route === '${route}'}
-      {@html ${JSON.stringify(tag_start)}}
-      {@html ${JSON.stringify(raw)}}
-      {@html ${JSON.stringify(tag_end)}}
+      {@html ${quoteJsonString(tag_start)}}
+      {@html ${quoteJsonString(raw)}}
+      {@html ${quoteJsonString(tag_end)}}
     {/if}
     `
     )}
   `.replaceAll('    ', '');
+};
+
+const quoteJsonString = (html: string) => `String.raw\`${html}\``;
+
+export const mjmlParseStyles = (style: string): string => {
+  try {
+    const html = stringToHtml(style);
+    const raw = getText(html) ?? style;
+    return raw;
+  } catch (error) {
+    console.warn('Error parsing styles:', error);
+    return style;
+  }
+};
+
+export const mjmlFormatStyles = (raw: string): string => {
+  try {
+    const doc = stringToHtml('');
+    createChildText(doc, raw);
+    const html = htmlToString(doc);
+    return html;
+  } catch (error) {
+    console.warn('Error formatting styles:', error);
+    return raw;
+  }
 };
 
 export const loadRoutes = <PageLoadFn extends Function>(

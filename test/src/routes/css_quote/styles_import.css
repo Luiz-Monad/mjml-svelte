@@ -1,0 +1,22 @@
+/* this requires vitePreprocess */
+@import url('https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+.gradient-bg {
+  background: linear-gradient(
+    to right,
+    rgba(var(--color-primary-600, 197, 62, 108), 1),
+    rgba(var(--color-secondary-800, 8, 65, 65), 1),
+    rgba(var(--color-secondary-900, 0, 0, 0), 1)
+  );
+}
+.shadow {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+.footer-gradient {
+  background: linear-gradient(
+    to bottom right,
+    rgba(var(--color-primary-700, 134, 25, 62), 1),
+    rgba(var(--color-secondary-800, 8, 65, 65), 1),
+    rgba(var(--color-secondary-900, 0, 0, 0), 1)
+  );
+}

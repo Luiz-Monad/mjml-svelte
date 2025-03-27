@@ -11,7 +11,12 @@ import mjml2html from 'mjml';
 import { minify } from 'html-minifier';
 import MagicString from 'magic-string';
 
-import { mjmlProcessInclude, mjmlTransformToSvelte, requestContextSvelte } from './plugin_base';
+import {
+  extension,
+  mjmlProcessInclude,
+  mjmlTransformToSvelte,
+  requestContextSvelte
+} from './plugin_base';
 import {
   createChildTag,
   createChildText,
@@ -21,10 +26,10 @@ import {
   isElement,
   moveAllChild,
   removeChild,
-  stringToXml,
-  xmlToString,
-  type XmlDocument
-} from './utils/mjml';
+  stringToHtml,
+  htmlToString,
+  type HtmlDocument
+} from './utils/dom';
 import {
   appendQueryParam,
   buildIdParser,
@@ -127,10 +132,7 @@ function createLoader({ vite, config }: { vite?: ViteDevServer; config?: InlineC
       const [_, nId] = await ssr.moduleGraph.resolveUrl(id);
       const nodeModule = ssr.runner.evaluatedModules.getModuleById(nId)!;
       const depMap = nodeModule.imports ?? new Set();
-      dependencies.push(
-        ...Array.from(depMap.keys())
-          .filter((m) => !dependencies.includes(m))
-      );
+      dependencies.push(...Array.from(depMap.keys()).filter((m) => !dependencies.includes(m)));
       return module;
     },
     closeLoader: async () => {
@@ -172,7 +174,7 @@ export function mjmlPlugin(): Plugin[] {
       async config(config) {
         config.optimizeDeps = {
           ...config.optimizeDeps,
-          extensions: ['.mjml.svelte', ...(config.optimizeDeps?.extensions ?? [])]
+          extensions: [extension, ...(config.optimizeDeps?.extensions ?? [])]
         };
       }
     },

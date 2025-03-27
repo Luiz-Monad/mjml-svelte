@@ -45,3 +45,9 @@ test('check if imported css on style rendering works', async () => {
   const expectedHtml = await expected('css_import', htmlContent);
   expect(htmlContent).toContain(expectedHtml);
 });
+
+test('check if quoting css works', async () => {
+  const htmlContent = await render('css_quote');
+  const expectedHtml = await expected('css_quote', htmlContent);
+  expect(htmlContent).toContain(expectedHtml);
+});

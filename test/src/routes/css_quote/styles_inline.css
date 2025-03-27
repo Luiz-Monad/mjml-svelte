@@ -1,0 +1,27 @@
+/* this requires vitePreprocess */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap');
+
+.primary {
+  color: rgba(var(--color-primary-500, 241, 113, 157), 1);
+}
+.secondary {
+  color: rgba(var(--color-secondary-600, 116, 203, 203), 1);
+}
+.background {
+  background-color: rgba(var(--color-background, 38, 43, 50), 1);
+}
+.green {
+  color: rgb(22 163 74);
+}
+.gray {
+  color: rgb(75 85 99);
+}
+.type {
+  color: rgba(var(--color-type, 255, 255, 255), 1);
+}
+.type-50 {
+  color: rgba(var(--color-type, 255, 255, 255), 0.5);
+}
+.card {
+  background-color: rgba(var(--color-card, 46, 38, 34), 1);
+}

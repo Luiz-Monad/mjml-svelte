@@ -104,9 +104,12 @@ $ pnpm install mjml-svelte
    ```js
    // svelte.config.js
    import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+   import { mjmlPreprocess } from 'mjml-svelte/config';
 
    /** @type {import('@sveltejs/kit').Config} */
    const config = {
+     //if you need to preprocess using vitePreprocess then you wrap vitePreprocess.
+     preprocess: mjmlPreprocess(vitePreprocess()),
      extensions: ['.mjml.svelte', '.svelte'],
      kit: {
        // your config
@@ -114,6 +117,8 @@ $ pnpm install mjml-svelte
    };
    export default config;
    ```
+
+   If you need to preprocess CSS in your application before compiling Svelte pages (for ex, _tailwindcss_), then you need to add mjmlPreprocess before vitePreprocess, otherwise the rendered HTML inside the @html clause might be preprocessed again wrongly, which causes errors.
 
 4. **MJML Svelte Page:**
 
