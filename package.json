@@ -41,6 +41,16 @@
         "require": "./dist/plugin_svelte.js"
       }
     },
+    "./config": {
+      "import": {
+        "types": "./dist/plugin_config.d.ts",
+        "import": "./dist/plugin_config.mjs"
+      },
+      "require": {
+        "types": "./dist/plugin_config.d.ts",
+        "require": "./dist/plugin_config.js"
+      }
+    },
     "./vite": {
       "import": {
         "types": "./dist/plugin_vite.d.ts",
@@ -300,6 +310,7 @@
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-svelte": "^3.1.0",
     "fast-glob": "^3.3.3",
+    "postcss": "^8.5.3",
     "prettier": "^3.5.3",
     "prettier-plugin-svelte": "^3.3.3",
     "rollup-plugin-node-externals": "^8.0.0",
