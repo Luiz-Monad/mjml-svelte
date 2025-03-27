@@ -34,7 +34,11 @@ import {
   removeQueryParams
 } from './utils/request_id';
 
-function injectStyles(mjmlXml: XmlDocument, cssStyles: string[]): XmlDocument {
+function injectStylesScripts(
+  mjmlXml: HtmlDocument,
+  styles: string[],
+  scripts: string[]
+): HtmlDocument {
   const mjml = mjmlXml.firstChild;
   if (!mjml || !isElement(mjml) || mjml.tagName !== 'mjml') return mjmlXml ?? undefined;
   const mjStyles = findChildByTagName(mjml, 'mj-style');
@@ -46,16 +50,26 @@ function injectStyles(mjmlXml: XmlDocument, cssStyles: string[]): XmlDocument {
     }
   }
   const mjHead = getOrCreateChildTag(mjml, 'mj-head');
-  for (const style of cssStyles) {
-    const mjStyle = createChildTag(mjHead, 'mj-style');
+  for (const style of styles) {
+    const mjStyle = createChildTag(mjHead, 'mj-style', 'style');
     createChildText(mjStyle, style.replaceAll('\r\n', '\n'));
+  }
+  for (const script of scripts) {
+    const mjRaw = createChildTag(mjHead, 'mj-raw', 'script');
+    const scriptTag = createChildTag(mjRaw, 'script', 'script');
+    createChildText(scriptTag, script.replaceAll('\r\n', '\n'));
   }
   return mjmlXml;
 }
 
-async function renderMjmlBody(mjmlSvelte: string, cssStyles: string[], isRaw: boolean) {
+async function renderMjmlBody(
+  mjmlSvelte: string,
+  styles: string[],
+  scripts: string[],
+  isRaw: boolean
+) {
   const mjmlTerse = minify(mjmlSvelte, { removeComments: true, collapseWhitespace: true });
-  const mjmlJson = xmlToString(injectStyles(stringToXml(mjmlTerse), cssStyles));
+  const mjmlJson = htmlToString(injectStylesScripts(stringToHtml(mjmlTerse), styles, scripts));
   if (isRaw) return mjmlJson;
   const mjmlMail = mjml2html(mjmlJson, {
     fonts: {}
@@ -109,15 +123,12 @@ function createLoader({ vite, config }: { vite?: ViteDevServer; config?: InlineC
       if (!isRunnableDevEnvironment(ssr)) {
         throw new Error(`no runnable dev env was found`);
       }
-      const depMap = ssr.runner.evaluatedModules.urlToIdModuleMap;
-      const loaded = Array.from(depMap.keys());
       const module = await ssr.runner.import(id);
+      const [_, nId] = await ssr.moduleGraph.resolveUrl(id);
+      const nodeModule = ssr.runner.evaluatedModules.getModuleById(nId)!;
+      const depMap = nodeModule.imports ?? new Set();
       dependencies.push(
         ...Array.from(depMap.keys())
-          .filter((m) => !loaded.includes(m))
-          .map((m) => depMap.get(m))
-          .filter((m) => !!m)
-          .map((m) => m.id)
           .filter((m) => !dependencies.includes(m))
       );
       return module;
@@ -131,11 +142,22 @@ function createLoader({ vite, config }: { vite?: ViteDevServer; config?: InlineC
 }
 
 export function mjmlPlugin(): Plugin[] {
-  const serverId = (id: string) => id.replace('.mjml.svelte', '.server.ts');
+  const filterId = (id: string) => id.endsWith(extension);
+  const serverId = (id: string) => id.replace(extension, '.server.ts');
   const cssRequestId = 'virtual:__mjml_svelte_style';
 
-  const filterId = (id) => {
-    return id.endsWith('.mjml.svelte');
+  const viteHotReload = {
+    id: '__mjml_svelte/hotReload.ts',
+    code: `
+      if (import.meta.hot) {
+        import.meta.hot.on('mjml', (data) => {
+          window.location.reload();
+        });
+      }
+    `.replaceAll('    ', ''),
+    client: `
+      import('/@id/__mjml_svelte/hotReload.ts');
+    `.replaceAll('    ', '')
   };
 
   let requestParser: ReturnType<typeof buildIdParser>;
@@ -173,15 +195,22 @@ export function mjmlPlugin(): Plugin[] {
         if (id === requestContextSvelte.id) {
           return id;
         }
+        if (id === viteHotReload.id) {
+          return id;
+        }
       },
 
       async load(id, options) {
         if (id === requestContextSvelte.id) {
           return renderSourceMap(id, requestContextSvelte.code);
         }
+        if (id === viteHotReload.id) {
+          return renderSourceMap(id, viteHotReload.code);
+        }
         const req = requestParser(id);
         if (!req || getQueryParam(req.rawQuery, 'mjml')) return;
         const isSSR = !!options?.ssr;
+        const isDEV = viteConfig.command === 'serve';
         const { loader, closeLoader, dependencies } = createLoader({ vite: viteDevServer });
         try {
           const pageLoader = async (pageId: string) =>
@@ -192,20 +221,33 @@ export function mjmlPlugin(): Plugin[] {
           const svelteServer = (await loader(idServer)) as any;
           const svelteContext = (await loader(requestContextSvelte.id)) as any;
           const svelteStyles = await Promise.all(dependencies.filter(isCSSRequest).map(pageLoader));
+          const svelteScripts = isDEV ? [{ default: viteHotReload.client }] : [];
           const svelteComponent = await mjmlTransformToSvelte(
             svelteContext,
             sveltePage,
             svelteServer,
             svelteStyles,
+            svelteScripts,
             renderMjmlBody,
             isSSR
           );
+          this.addWatchFile(idServer);
+          dependencies.filter(isCSSRequest).forEach((id) => this.addWatchFile(id));
           return {
             code: svelteComponent
           };
         } finally {
           await closeLoader();
         }
+      },
+
+      handleHotUpdate({ server }) {
+        server.ws.send({
+          type: 'custom',
+          event: 'mjml',
+          data: {}
+        });
+        return [];
       }
     },
     {
@@ -226,6 +268,7 @@ export function mjmlPlugin(): Plugin[] {
         const idCss = Buffer.from(idCssB64, 'base64').toString();
         const { loader, closeLoader } = createLoader({});
         try {
+          this.addWatchFile(idCss);
           const css = await loader(appendQueryParam(idCss, 'inline', ''));
           return {
             code: `export default ${JSON.stringify(css.default)}`

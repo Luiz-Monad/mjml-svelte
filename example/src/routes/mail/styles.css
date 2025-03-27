@@ -1,0 +1,8 @@
+.gradient-bg {
+  background: linear-gradient(
+    to right,
+    rgba(var(--color-primary-600, 197, 62, 108), 1),
+    rgba(var(--color-secondary-800, 8, 65, 65), 1),
+    rgba(var(--color-secondary-900, 0, 0, 0), 1)
+  );
+}

@@ -11,9 +11,15 @@ interface PageEvent {
 }
 
 type Loader = (url: string) => Promise<PageComponent>;
-type Renderer = (mjmlSvelte: string, styles: string[], isRaw: boolean) => Promise<string>;
+type Renderer = (
+  mjmlSvelte: string,
+  styles: string[],
+  scripts: string[],
+  isRaw: boolean
+) => Promise<string>;
 type PageData = Record<string, any>;
 type PageStyles = { default: string }[];
+type PageScripts = { default: string }[];
 type PageLoadFn = (event: PageEvent) => Promise<PageData>;
 type PageComponent = { default: typeof SvelteComponent };
 type PageServerComponent = {
@@ -61,6 +67,7 @@ export const mjmlTransformToSvelte = async (
   sveltePage: PageComponent,
   svelteServer: PageServerComponent,
   svelteStyles: PageStyles,
+  svelteScripts: PageScripts,
   renderMjmlBody: Renderer,
   isSSR: boolean
 ) => {
@@ -76,9 +83,10 @@ export const mjmlTransformToSvelte = async (
         props: { page, children: sveltePage.default }
       });
       const styles = Array.from(svelteStyles.map((s) => s.default));
+      const scripts = Array.from(svelteScripts.map((s) => s.default));
       return {
         route,
-        raw: await renderMjmlBody(html.body, styles, isRaw)
+        raw: await renderMjmlBody(html.body, styles, scripts, isRaw)
       };
     })
   );

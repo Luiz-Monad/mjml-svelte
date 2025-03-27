@@ -8,6 +8,7 @@
     MjColumn,
     MjHead,
     Mjml,
+    MjRaw,
     MjSection,
     MjStyle,
     MjTable,
@@ -15,6 +16,7 @@
     MjTitle,
     MjWrapper
   } from 'mjml-svelte';
+  import './styles.css';
 </script>
 
 <Mjml>
@@ -32,14 +34,6 @@
         }
         .gray {
           color: rgba(var(--color-card, 255, 38, 34), 1);
-        }
-        .gradient-bg {
-          background: linear-gradient(
-            to right,
-            rgba(var(--color-primary-600, 197, 62, 108), 1),
-            rgba(var(--color-secondary-800, 8, 65, 65), 1),
-            rgba(var(--color-secondary-900, 0, 0, 0), 1)
-          );
         }
         .shadow {
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
