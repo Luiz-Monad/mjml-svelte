@@ -51,6 +51,8 @@
 
 <style>
   main {
+    background-color: white;
+    color: black;
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;

@@ -1,4 +1,4 @@
-import { type Handle, type LoadEvent, type Load } from '@sveltejs/kit';
+import type { Handle, LoadEvent, Load } from '@sveltejs/kit';
 
 import { loadRoute, loadRoutes, mjmlFilterHtml } from './plugin_base';
 
