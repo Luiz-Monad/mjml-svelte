@@ -13,12 +13,14 @@ interface PageEvent {
   url: URL;
 }
 
+type Logger = (msg: string) => void;
 type Loader = (url: string) => Promise<PageComponent>;
 type Renderer = (
   mjmlSvelte: string,
   styles: string[],
   scripts: string[],
-  isRaw: boolean
+  isRaw: boolean,
+  logWarn: Logger
 ) => Promise<string>;
 type PageData = Record<string, any>;
 type PageStyles = { default: string }[];
@@ -72,7 +74,8 @@ export const mjmlTransformToSvelte = async (
   svelteStyles: PageStyles,
   svelteScripts: PageScripts,
   renderMjmlBody: Renderer,
-  isSSR: boolean
+  isSSR: boolean,
+  logWarn: Logger
 ) => {
   const isRaw = !!svelteServer._raw;
   const isNoCsr = !!svelteServer._noCsr;
@@ -89,7 +92,7 @@ export const mjmlTransformToSvelte = async (
       const scripts = Array.from(svelteScripts.map((s) => s.default));
       return {
         route,
-        raw: await renderMjmlBody(html.body, styles, scripts, isRaw)
+        raw: await renderMjmlBody(html.body, styles, scripts, isRaw, logWarn)
       };
     })
   );

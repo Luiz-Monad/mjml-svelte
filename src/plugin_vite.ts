@@ -71,7 +71,8 @@ async function renderMjmlBody(
   mjmlSvelte: string,
   styles: string[],
   scripts: string[],
-  isRaw: boolean
+  isRaw: boolean,
+  logWarn: (warn: string) => void
 ) {
   const mjmlTerse = minify(mjmlSvelte, { removeComments: true, collapseWhitespace: true });
   const mjmlJson = htmlToString(injectStylesScripts(stringToHtml(mjmlTerse), styles, scripts));
@@ -87,6 +88,9 @@ async function renderMjmlBody(
     minifyCSS: true,
     minifyJS: true
   });
+  if (mjmlMail.errors && mjmlMail.errors.length > 0) {
+    Array.from(mjmlMail.errors).forEach((e) => logWarn(e.formattedMessage));
+  }
   return minifiedHtml;
 }
 
@@ -215,6 +219,7 @@ export function mjmlPlugin(): Plugin[] {
         const isDEV = viteConfig.command === 'serve';
         const { loader, closeLoader, dependencies } = createLoader({ vite: viteDevServer });
         try {
+          const logWarn = (s: string) => this.warn(s);
           const pageLoader = async (pageId: string) =>
             await loader(appendQueryParam(normalizeId(id, pageId), 'mjml', '1'));
           const idPage = appendQueryParam(id, 'mjml', '1');
@@ -231,7 +236,8 @@ export function mjmlPlugin(): Plugin[] {
             svelteStyles,
             svelteScripts,
             renderMjmlBody,
-            isSSR
+            isSSR,
+            logWarn
           );
           this.addWatchFile(idServer);
           dependencies.filter(isCSSRequest).forEach((id) => this.addWatchFile(id));
