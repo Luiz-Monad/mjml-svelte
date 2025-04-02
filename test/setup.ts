@@ -16,3 +16,5 @@ afterAll(async () => {
 });
 
 export { page };
+
+// TODO : vitest running in test mode needs to start the vite dev server
