@@ -1,4 +1,5 @@
 <script lang="ts">
-  // import page from '../+page.mjml.svelte';
-  export const __mjml_include = '../+page.mjml.svelte';
+  import { MjInclude } from 'mjml-svelte';
 </script>
+
+<MjInclude path="../mail/+page.mjml.svelte" />

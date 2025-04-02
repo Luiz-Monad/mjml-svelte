@@ -11,7 +11,13 @@ import mjml2html from 'mjml';
 import { minify } from 'html-minifier';
 import MagicString from 'magic-string';
 
-import { extension, renderSveltePage, requestContextSvelte } from './plugin_base';
+import {
+  extension,
+  renderRaw,
+  renderSveltePage,
+  renderSveltePageComponent,
+  requestContextSvelte
+} from './plugin_base';
 import {
   createChildTag,
   createChildText,
@@ -65,19 +71,42 @@ function injectStylesScripts(
   return mjmlXml;
 }
 
+async function injectIncludes(
+  mjmlXml: HtmlDocument,
+  options: {
+    rawPageLoader: (pageId: string) => Promise<string>;
+  }
+): Promise<HtmlDocument> {
+  const mjml = mjmlXml;
+  if (!mjml) return mjmlXml ?? undefined;
+  const mjIncludes = findChildByTagName(mjml, 'mj-include');
+  for (const include of mjIncludes) {
+    const parent = include.parent;
+    if (!parent) continue;
+    const path = getAttribute(include, 'path');
+    if (!path) continue;
+    const mjmlSvelte = await options.rawPageLoader(path);
+    const mjmlTerse = minify(mjmlSvelte, { removeComments: true, collapseWhitespace: true });
+    const xml = stringToHtml(mjmlTerse);
+    removeChild(parent, include);
+    moveAllChild(xml, parent);
+  }
+  return mjmlXml;
+}
+
 async function renderMjmlBody(
   mjmlSvelte: string,
   isRaw: boolean,
   options: {
     styles: string[];
     scripts: string[];
-    pageLoader: (pageId: string) => Promise<any>;
+    rawPageLoader: (pageId: string) => Promise<any>;
     logWarn: (warn: string) => void;
   }
 ) {
   const mjmlTerse = minify(mjmlSvelte, { removeComments: true, collapseWhitespace: true });
   const mjmlJson = htmlToString(
-    injectStylesScripts(stringToHtml(mjmlTerse), options)
+    injectStylesScripts(await injectIncludes(stringToHtml(mjmlTerse), options), options)
   );
   if (isRaw) return mjmlJson;
   const mjmlMail = mjml2html(mjmlJson, {
@@ -223,36 +252,44 @@ export function mjmlPlugin(): Plugin[] {
         const { loader, closeLoader, dependencies } = createLoader({ vite: viteDevServer });
         try {
           const logWarn = (s: string) => this.warn(s);
-          const pageLoader = async (pageId: string) =>
-            await loader(appendQueryParam(normalizeId(id, pageId), 'mjml', '1'));
-          const styleLoader = async (styleId: string) =>
-            (await pageLoader(styleId)).default as string;
-          const idPage = appendQueryParam(id, 'mjml', '1');
-          const idServer = serverId(idPage);
-          const sveltePage = await pageLoader(idPage);
-          const svelteServer = await loader(idServer);
-          const svelteContext = await loader(requestContextSvelte.id);
-          const styles = await Promise.all(
-            dependencies.filter(isCSSRequest).map(styleLoader)
-          );
-          const scripts = isDEV ? [viteHotReload.client] : [];
-          const svelteComponent = await renderSveltePage(
-            svelteContext,
-            sveltePage,
-            svelteServer,
-            renderMjmlBody,
-            {
-            isSSR,
-              styles,
-              scripts,
-              pageLoader,
-            logWarn
-            }
-          );
-          this.addWatchFile(idServer);
-          dependencies.filter(isCSSRequest).forEach((id) => this.addWatchFile(id));
+          const render = async (id: string, renderer: typeof renderMjmlBody) => {
+            const pageLoader = async (pageId: string) =>
+              await loader(appendQueryParam(normalizeId(id, pageId), 'mjml', '1'));
+
+            const styleLoader = async (styleId: string) =>
+              (await pageLoader(styleId)).default as string;
+
+            const rawPageLoader = async (pageId: string) =>
+              renderRaw(await render(normalizeId(id, pageId), (pass) => Promise.resolve(pass)));
+
+            const idPage = appendQueryParam(id, 'mjml', '1');
+            const idServer = serverId(idPage);
+            const sveltePage = await pageLoader(idPage);
+            const svelteServer = await loader(idServer);
+            const svelteContext = await loader(requestContextSvelte.id);
+            const styles = await Promise.all(dependencies.filter(isCSSRequest).map(styleLoader));
+            const scripts = isDEV ? [viteHotReload.client] : [];
+
+            const renderedPage = await renderSveltePage(
+              svelteContext,
+              sveltePage,
+              svelteServer,
+              renderer,
+              {
+                isSSR,
+                styles,
+                scripts,
+                logWarn,
+                rawPageLoader
+              }
+            );
+
+            this.addWatchFile(idServer);
+            dependencies.filter(isCSSRequest).forEach((id) => this.addWatchFile(id));
+            return renderedPage;
+          };
           return {
-            code: svelteComponent
+            code: renderSveltePageComponent(await render(id, renderMjmlBody))
           };
         } finally {
           await closeLoader();

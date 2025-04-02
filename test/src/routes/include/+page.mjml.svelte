@@ -1,3 +1,5 @@
 <script lang="ts">
-  export const __mjml_include = '../mail/+page.mjml.svelte';
+  import { MjInclude } from '$library';
 </script>
+
+<MjInclude path="../mail/+page.mjml.svelte" />
