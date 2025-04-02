@@ -102,19 +102,27 @@ export const mjmlTransformToSvelte = async (
       import { page } from '$app/state';
       const _route = page.data._route;
     </script>
-    ${entries.map(
-      ({ route, raw }) => `
+    ${entries
+      .map(
+        ({ route, raw }) => `
     {#if _route === '${route}'}
       {@html ${quoteJsonString(tag_start)}}
       {@html ${quoteJsonString(raw)}}
       {@html ${quoteJsonString(tag_end)}}
     {/if}
     `
-    )}
+      )
+      .join('')}
   `.replaceAll('    ', '');
 };
 
-const quoteJsonString = (html: string) => `String.raw\`${html}\``;
+const quoteJsonString = (html: string) =>
+  '`' +
+  html.replaceAll(
+    /\r|\n|\t|\\|`|\$/g,
+    (r) => '\\' + (({ '\r': 'r', '\n': 'n', '\t': 't' })[r] ?? r)
+  ) +
+  '`';
 
 export const mjmlParseStyles = (style: string): string => {
   try {
