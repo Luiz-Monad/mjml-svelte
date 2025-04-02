@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.3.0...v1.3.1) (2025-04-02)
+
+
+### Bug Fixes
+
+* svelte template string quoting ([0aa3d22](https://github.com/Luiz-Monad/mjml-svelte/commit/0aa3d2241142decd9926c0bb253b7113f2c30c9d))
+
 ## [1.3.0](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.2.0...v1.3.0) (2025-03-27)
 
 
