@@ -63,8 +63,8 @@ export const renderSveltePage = async <Options extends RenderOptions>(
 ) => {
   const isRaw = !!svelteServer._raw;
   const isNoCsr = !!svelteServer._noCsr;
-  if (isNoCsr && !renderOptions.isSSR) return '';
-  const entries = await Promise.all(
+  if (isNoCsr && !renderOptions.isSSR) return;
+  return await Promise.all(
     svelteServer.load._routes.map(async (route) => {
       const url = new URL(route, 'http://host/');
       const data = await svelteServer.load({ url });
@@ -78,7 +78,12 @@ export const renderSveltePage = async <Options extends RenderOptions>(
       };
     })
   );
+};
 
+type PageEntries = { route: string; raw: string }[];
+
+export const renderSveltePageComponent = (entries?: PageEntries) => {
+  if (!entries) return '';
   return `
     <script lang="ts">
       import { page } from '$app/state';
@@ -96,6 +101,10 @@ export const renderSveltePage = async <Options extends RenderOptions>(
       )
       .join('')}
   `.replaceAll('    ', '');
+};
+
+export const renderRaw = (entries: PageEntries) => {
+  return entries.length > 0 ? entries[0].raw : '';
 };
 
 const quoteJsonString = (html: string) =>
