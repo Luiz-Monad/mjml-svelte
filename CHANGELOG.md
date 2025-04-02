@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.3](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.3.2...v1.3.3) (2025-04-02)
+
+
+### Bug Fixes
+
+* table component helpers ([59d66cd](https://github.com/Luiz-Monad/mjml-svelte/commit/59d66cd4d0c56b3b7880a3556d6e777e9b11e2e8))
+
 ## [1.3.2](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.3.1...v1.3.2) (2025-04-02)
 
 
