@@ -1,6 +1,6 @@
 import type { Handle, LoadEvent, Load } from '@sveltejs/kit';
 
-import { loadRoute, loadRoutes, mjmlFilterHtml } from './plugin_base';
+import { loadRoute, loadRoutes, filterHtml } from './plugin_base';
 
 export const mjmlServerPageLoad = <
   Params extends Partial<Record<string, string>>,
@@ -23,6 +23,6 @@ export const mjmlServerPageLoad = <
 
 export const mjmlHandler: Handle = async ({ event, resolve }) => {
   return await resolve(event, {
-    transformPageChunk: ({ html }) => mjmlFilterHtml(html)
+    transformPageChunk: ({ html }) => filterHtml(html)
   });
 };

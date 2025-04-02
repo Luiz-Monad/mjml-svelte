@@ -1,14 +1,15 @@
 import { ElementType, parseDocument } from 'htmlparser2';
 import { render } from 'dom-serializer';
 import {
-  type Node,
-  Element,
   type Document,
-  Text,
+  type Node,
+  type NodeWithChildren,
+  Element,
+  hasChildren,
+  isDocument,
   isTag,
   isText,
-  hasChildren,
-  type NodeWithChildren
+  Text
 } from 'domhandler';
 
 export type HtmlDocument = Document;
@@ -26,8 +27,14 @@ export function isElement(node: Node): node is Element {
   return isTag(node);
 }
 
-export function getText(node: Node): string | null {
-  return isText(node) ? node.data : null;
+export function getText(node: Node): string | undefined {
+  return isText(node) ? node.data : undefined;
+}
+
+export function getAttribute(node: Node, attribName: string): string | undefined {
+  return isTag(node)
+    ? node.attributes.find((attrib) => attrib.name === attribName)?.value
+    : undefined;
 }
 
 export function findOneByTagName(parent: NodeWithChildren, tagName: string): Element | undefined {
@@ -36,7 +43,7 @@ export function findOneByTagName(parent: NodeWithChildren, tagName: string): Ele
 
 export function findChildByTagName(parent: NodeWithChildren, tagName: string): Element[] {
   return parent.children
-    .filter(isElement)
+    .filter(isTag)
     .flatMap((child) => [
       ...(hasChildren(child) ? findChildByTagName(child, tagName) : []),
       ...(child.tagName === tagName ? [child] : [])
@@ -75,11 +82,11 @@ export function getOrCreateChildTag(parent: NodeWithChildren, tagName: string): 
   return createChildTag(parent, tagName);
 }
 
-export function moveAllChild(fromParent: Element, toParent: Element) {
+export function moveAllChild(fromParent: NodeWithChildren, toParent: NodeWithChildren) {
   const items = fromParent.children;
   fromParent.children = [];
   for (const item of items) {
-    item.parent = toParent;
+    item.parent = isTag(toParent) ? toParent : isDocument(toParent) ? toParent : null;
   }
   toParent.children.push(...items);
 }

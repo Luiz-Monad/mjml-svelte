@@ -1,18 +1,18 @@
 import type { Preprocessor, PreprocessorGroup, Processed } from 'svelte/compiler';
 
-import { extension, mjmlFormatStyles, mjmlParseStyles } from './plugin_base';
+import { extension, formatStyles, parseStyles } from './plugin_base';
 
 export function mjmlPreprocess(wrap?: PreprocessorGroup): PreprocessorGroup {
   const preTransform = (opt: Parameters<Preprocessor>[0]) => {
     if (!opt.filename || !opt.filename.endsWith(extension)) return;
-    return mjmlParseStyles(opt.content);
+    return parseStyles(opt.content);
   };
   const pass: Preprocessor = (opt) => ({ code: opt.content });
   const transform: Preprocessor = wrap?.style ?? pass;
   const postTransform = (input: Processed): Processed => {
     return {
       ...input,
-      code: mjmlFormatStyles(input.code)
+      code: formatStyles(input.code)
     };
   };
   return {

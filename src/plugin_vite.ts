@@ -11,23 +11,19 @@ import mjml2html from 'mjml';
 import { minify } from 'html-minifier';
 import MagicString from 'magic-string';
 
-import {
-  extension,
-  mjmlProcessInclude,
-  mjmlTransformToSvelte,
-  requestContextSvelte
-} from './plugin_base';
+import { extension, renderSveltePage, requestContextSvelte } from './plugin_base';
 import {
   createChildTag,
   createChildText,
   findChildByTagName,
   findOneByTagName,
+  getAttribute,
   getOrCreateChildTag,
+  htmlToString,
   isElement,
   moveAllChild,
   removeChild,
   stringToHtml,
-  htmlToString,
   type HtmlDocument
 } from './utils/dom';
 import {
@@ -41,8 +37,10 @@ import {
 
 function injectStylesScripts(
   mjmlXml: HtmlDocument,
-  styles: string[],
-  scripts: string[]
+  options: {
+    styles: string[];
+    scripts: string[];
+  }
 ): HtmlDocument {
   const mjml = mjmlXml.firstChild;
   if (!mjml || !isElement(mjml) || mjml.tagName !== 'mjml') return mjmlXml ?? undefined;
@@ -55,11 +53,11 @@ function injectStylesScripts(
     }
   }
   const mjHead = getOrCreateChildTag(mjml, 'mj-head');
-  for (const style of styles) {
+  for (const style of options.styles) {
     const mjStyle = createChildTag(mjHead, 'mj-style', 'style');
     createChildText(mjStyle, style.replaceAll('\r\n', '\n'));
   }
-  for (const script of scripts) {
+  for (const script of options.scripts) {
     const mjRaw = createChildTag(mjHead, 'mj-raw', 'script');
     const scriptTag = createChildTag(mjRaw, 'script', 'script');
     createChildText(scriptTag, script.replaceAll('\r\n', '\n'));
@@ -69,13 +67,18 @@ function injectStylesScripts(
 
 async function renderMjmlBody(
   mjmlSvelte: string,
-  styles: string[],
-  scripts: string[],
   isRaw: boolean,
-  logWarn: (warn: string) => void
+  options: {
+    styles: string[];
+    scripts: string[];
+    pageLoader: (pageId: string) => Promise<any>;
+    logWarn: (warn: string) => void;
+  }
 ) {
   const mjmlTerse = minify(mjmlSvelte, { removeComments: true, collapseWhitespace: true });
-  const mjmlJson = htmlToString(injectStylesScripts(stringToHtml(mjmlTerse), styles, scripts));
+  const mjmlJson = htmlToString(
+    injectStylesScripts(stringToHtml(mjmlTerse), options)
+  );
   if (isRaw) return mjmlJson;
   const mjmlMail = mjml2html(mjmlJson, {
     fonts: {}
@@ -89,7 +92,7 @@ async function renderMjmlBody(
     minifyJS: true
   });
   if (mjmlMail.errors && mjmlMail.errors.length > 0) {
-    Array.from(mjmlMail.errors).forEach((e) => logWarn(e.formattedMessage));
+    Array.from(mjmlMail.errors).forEach((e) => options.logWarn(e.formattedMessage));
   }
   return minifiedHtml;
 }
@@ -222,22 +225,29 @@ export function mjmlPlugin(): Plugin[] {
           const logWarn = (s: string) => this.warn(s);
           const pageLoader = async (pageId: string) =>
             await loader(appendQueryParam(normalizeId(id, pageId), 'mjml', '1'));
+          const styleLoader = async (styleId: string) =>
+            (await pageLoader(styleId)).default as string;
           const idPage = appendQueryParam(id, 'mjml', '1');
           const idServer = serverId(idPage);
-          const sveltePage = (await mjmlProcessInclude(pageLoader as any, idPage)) as any;
-          const svelteServer = (await loader(idServer)) as any;
-          const svelteContext = (await loader(requestContextSvelte.id)) as any;
-          const svelteStyles = await Promise.all(dependencies.filter(isCSSRequest).map(pageLoader));
-          const svelteScripts = isDEV ? [{ default: viteHotReload.client }] : [];
-          const svelteComponent = await mjmlTransformToSvelte(
+          const sveltePage = await pageLoader(idPage);
+          const svelteServer = await loader(idServer);
+          const svelteContext = await loader(requestContextSvelte.id);
+          const styles = await Promise.all(
+            dependencies.filter(isCSSRequest).map(styleLoader)
+          );
+          const scripts = isDEV ? [viteHotReload.client] : [];
+          const svelteComponent = await renderSveltePage(
             svelteContext,
             sveltePage,
             svelteServer,
-            svelteStyles,
-            svelteScripts,
             renderMjmlBody,
+            {
             isSSR,
+              styles,
+              scripts,
+              pageLoader,
             logWarn
+            }
           );
           this.addWatchFile(idServer);
           dependencies.filter(isCSSRequest).forEach((id) => this.addWatchFile(id));
