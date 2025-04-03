@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.5](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.3.4...v1.3.5) (2025-04-03)
+
+
+### Bug Fixes
+
+* update index with new components ([0b03a72](https://github.com/Luiz-Monad/mjml-svelte/commit/0b03a72e338f23be841a23ff700f442ac57fd0e6))
+
 ## [1.3.4](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.3.3...v1.3.4) (2025-04-03)
 
 
