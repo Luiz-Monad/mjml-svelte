@@ -1,5 +1,49 @@
 # Changelog
 
+## 1.0.0 (2025-04-03)
+
+
+### Features
+
+* added example ([3c6da3e](https://github.com/Luiz-Monad/mjml-svelte/commit/3c6da3e94160806058c3e8d2fdd3ac0be9c05705))
+* added example ([1e37a29](https://github.com/Luiz-Monad/mjml-svelte/commit/1e37a29d9463283ac19e71307a0ea7b20802fe5c))
+* disable client side rendering ([36eadc2](https://github.com/Luiz-Monad/mjml-svelte/commit/36eadc20e0d875fb7f834e761308c5eb43795a7e))
+* implemented hotreload ([20eb181](https://github.com/Luiz-Monad/mjml-svelte/commit/20eb181649bb1ea0b2552a8e2afdd84b129506cb))
+* implemented importing css styles ([6b0976b](https://github.com/Luiz-Monad/mjml-svelte/commit/6b0976b70e67157983f7a9bde487c2127bf8fc89))
+* mjml include ([3812163](https://github.com/Luiz-Monad/mjml-svelte/commit/3812163ec809d77d6f5e47487534933d8518606a))
+* raw mjml rendering ([198040a](https://github.com/Luiz-Monad/mjml-svelte/commit/198040a3979705220620c2de5f673c423c00451a))
+* svelte stores working ([884ff1a](https://github.com/Luiz-Monad/mjml-svelte/commit/884ff1ab2cee87e81ab0a7f642bc6e36cc1aba45))
+
+
+### Bug Fixes
+
+* added missing tests ([f5ad92c](https://github.com/Luiz-Monad/mjml-svelte/commit/f5ad92c27d218e54750f8731d93535cc81509445))
+* added mjml processor logs ([8c02695](https://github.com/Luiz-Monad/mjml-svelte/commit/8c02695eab72611adc4356adae5683dde6ff40e4))
+* combine tag style inside mj-style ([f2bd910](https://github.com/Luiz-Monad/mjml-svelte/commit/f2bd9108a5c9658cf27651928ac322332bd435fc))
+* copy components to output ([031d501](https://github.com/Luiz-Monad/mjml-svelte/commit/031d50119eae8e8ec430dc65175cbaa348ac477b))
+* docs ([30f0e45](https://github.com/Luiz-Monad/mjml-svelte/commit/30f0e45f7ad226c740bd36ca3ca892abd8a3dc69))
+* don't bundle external deps ([1ea4245](https://github.com/Luiz-Monad/mjml-svelte/commit/1ea4245d719fdcc28ff0c8f54673bfd3d3fcf909))
+* including mjml pages ([61db5b9](https://github.com/Luiz-Monad/mjml-svelte/commit/61db5b9eb56bf0bd8a547f82763fad0989858467))
+* install chromium on test ([8383feb](https://github.com/Luiz-Monad/mjml-svelte/commit/8383feb5d2efa9995e02d3f970b2190dcb6446dc))
+* manual code splitting between plugin ([5e7479f](https://github.com/Luiz-Monad/mjml-svelte/commit/5e7479f52f595a9d73a42aaf545760260d257790))
+* optional children ([4ed8890](https://github.com/Luiz-Monad/mjml-svelte/commit/4ed8890fe3d98a955f51ca47d7bc60517d2d2766))
+* readme ([d681de1](https://github.com/Luiz-Monad/mjml-svelte/commit/d681de129153cec590ab7f1ac603fb1bbff458af))
+* removed peer deps from build ([090437f](https://github.com/Luiz-Monad/mjml-svelte/commit/090437ffee784a7f5291a5b09c33c548d5f397f8))
+* removed tsup ([d5e9e54](https://github.com/Luiz-Monad/mjml-svelte/commit/d5e9e541629d2d54e674379c9db411c5e22a2e5d))
+* replaced vite ssr mod loader ([a0208d1](https://github.com/Luiz-Monad/mjml-svelte/commit/a0208d1d5cc53470239e66216a0cbd60dd05c3c1))
+* sample ([4f2a120](https://github.com/Luiz-Monad/mjml-svelte/commit/4f2a1209d24e4d3916457625f65557fc0ad1b84e))
+* server closing ([8bd7e0e](https://github.com/Luiz-Monad/mjml-svelte/commit/8bd7e0e72bb67c7cd47d5b41e56ac0e031af2551))
+* source map ([76dec15](https://github.com/Luiz-Monad/mjml-svelte/commit/76dec1582d999e7cc5803b510c9e57b5f77e6865))
+* style preprocessing ([4cc3d0a](https://github.com/Luiz-Monad/mjml-svelte/commit/4cc3d0a86b9ddbbd2ed703bd3d011f5be406b2bf))
+* svelte component build ([6d3e516](https://github.com/Luiz-Monad/mjml-svelte/commit/6d3e5164a6fc28fdf851c7f91b63255f9f2d8281))
+* svelte export files ([5844e4f](https://github.com/Luiz-Monad/mjml-svelte/commit/5844e4f4256058daacaa14561bb6442f2b94531f))
+* svelte template string quoting ([0d0cd9c](https://github.com/Luiz-Monad/mjml-svelte/commit/0d0cd9ceba2cbc7d1aa8052fd41d44ba24a1629b))
+* table component helpers ([9f5e17c](https://github.com/Luiz-Monad/mjml-svelte/commit/9f5e17c5d6bf2b2055e2b9f620b05d92db1fec25))
+* tests ([1aac81d](https://github.com/Luiz-Monad/mjml-svelte/commit/1aac81d6f948441f54c06275e9e91a32e75964e8))
+* update index with new components ([ba1ead1](https://github.com/Luiz-Monad/mjml-svelte/commit/ba1ead1c2fbde4f4057d09c7efe243091dff1ab0))
+* update package export table ([6798519](https://github.com/Luiz-Monad/mjml-svelte/commit/67985192ec598852b9847edb9a981699de9ad585))
+* vite output filenames ([41d1e18](https://github.com/Luiz-Monad/mjml-svelte/commit/41d1e18cdfab44123875a2b7cadbfd369eb76363))
+
 ## [1.3.4](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.3.3...v1.3.4) (2025-04-03)
 
 
