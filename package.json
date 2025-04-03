@@ -282,6 +282,18 @@
         "types": "./dist/components/MjPreview.svelte.d.ts",
         "import": "./dist/components/MjPreview.svelte"
       }
+    },
+    "./MjTableColumn.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjTableColumn.svelte.d.ts",
+        "import": "./dist/components/MjTableColumn.svelte"
+      }
+    },
+    "./MjTableRow.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjTableRow.svelte.d.ts",
+        "import": "./dist/components/MjTableRow.svelte"
+      }
     }
   },
   "files": [
