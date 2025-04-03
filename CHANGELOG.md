@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.4](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.3.3...v1.3.4) (2025-04-03)
+
+
+### Bug Fixes
+
+* update package export table ([2bfeacf](https://github.com/Luiz-Monad/mjml-svelte/commit/2bfeacf9dd0ba0f125f46c55e33094bab4f13ddb))
+
 ## [1.3.3](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.3.2...v1.3.3) (2025-04-02)
 
 
