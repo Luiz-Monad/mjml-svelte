@@ -283,16 +283,22 @@
         "import": "./dist/components/MjPreview.svelte"
       }
     },
-    "./MjTableColumn.svelte": {
+    "./MjSvTable.svelte": {
       "svelte": {
-        "types": "./dist/components/MjTableColumn.svelte.d.ts",
-        "import": "./dist/components/MjTableColumn.svelte"
+        "types": "./dist/components/MjSvTable.svelte.d.ts",
+        "import": "./dist/components/MjSvTable.svelte"
       }
     },
-    "./MjTableRow.svelte": {
+    "./MjSvTableColumn.svelte": {
       "svelte": {
-        "types": "./dist/components/MjTableRow.svelte.d.ts",
-        "import": "./dist/components/MjTableRow.svelte"
+        "types": "./dist/components/MjSvTableColumn.svelte.d.ts",
+        "import": "./dist/components/MjSvTableColumn.svelte"
+      }
+    },
+    "./MjSvTableRow.svelte": {
+      "svelte": {
+        "types": "./dist/components/MjSvTableRow.svelte.d.ts",
+        "import": "./dist/components/MjSvTableRow.svelte"
       }
     }
   },
@@ -317,6 +323,7 @@
     "@types/eslint": "^9.6.1",
     "@types/html-minifier": "^4.0.5",
     "@types/mjml": "^4.7.4",
+    "@types/mjml-core": "^4.15.1",
     "@types/node": "^22.13.10",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",
@@ -339,12 +346,16 @@
     "vite": "^6.2.1"
   },
   "dependencies": {
+    "@types/mjml-validator": "^4.13.4",
     "dom-serializer": "^2.0.0",
     "domhandler": "^5.0.3",
     "html-minifier": "^4.0.0",
     "htmlparser2": "^10.0.0",
     "magic-string": "^0.30.17",
-    "mjml": "^4.15.3"
+    "mjml": "^4.15.3",
+    "mjml-core": "^4.15.3",
+    "mjml-table": "^4.15.3",
+    "mjml-validator": "^4.15.3"
   },
   "engines": {
     "node": ">=18.0.0"

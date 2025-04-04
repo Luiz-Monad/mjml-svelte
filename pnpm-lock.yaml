@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@types/mjml-validator':
+        specifier: ^4.13.4
+        version: 4.13.4
       dom-serializer:
         specifier: ^2.0.0
         version: 2.0.0
@@ -24,6 +27,15 @@ importers:
         specifier: ^0.30.17
         version: 0.30.17
       mjml:
+        specifier: ^4.15.3
+        version: 4.15.3
+      mjml-core:
+        specifier: ^4.15.3
+        version: 4.15.3
+      mjml-table:
+        specifier: ^4.15.3
+        version: 4.15.3
+      mjml-validator:
         specifier: ^4.15.3
         version: 4.15.3
     devDependencies:
@@ -48,6 +60,9 @@ importers:
       '@types/mjml':
         specifier: ^4.7.4
         version: 4.7.4
+      '@types/mjml-core':
+        specifier: ^4.15.1
+        version: 4.15.1
       '@types/node':
         specifier: ^22.13.10
         version: 22.13.10
@@ -576,6 +591,9 @@ packages:
 
   '@types/mjml-core@4.15.1':
     resolution: {integrity: sha512-qu8dUksU8yXX18qMTFINkM4uoz7WQYC5F14lcWeSNmWbulaGG0KG19yeZwpx75b9RJXr8WI/FRHH0LyQTU9JbA==}
+
+  '@types/mjml-validator@4.13.4':
+    resolution: {integrity: sha512-FhZw4DXcrm4j8dUbMzFGjVd6NKAD8a1B2GFT1DoqquTgdXhLTVrWBWaatEiRT/xHCGtBc7k3aX+O+oXMnhq/6g==}
 
   '@types/mjml@4.7.4':
     resolution: {integrity: sha512-vyi1vzWgMzFMwZY7GSZYX0GU0dmtC8vLHwpgk+NWmwbwRSrlieVyJ9sn5elodwUfklJM7yGl0zQeet1brKTWaQ==}
@@ -2492,6 +2510,10 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/mjml-core@4.15.1': {}
+
+  '@types/mjml-validator@4.13.4':
+    dependencies:
+      '@types/mjml-core': 4.15.1
 
   '@types/mjml@4.7.4':
     dependencies:

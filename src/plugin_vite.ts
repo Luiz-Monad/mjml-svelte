@@ -11,6 +11,9 @@ import mjml2html from 'mjml';
 import { minify } from 'html-minifier';
 import MagicString from 'magic-string';
 
+//register mjml components
+import './mjml';
+
 import {
   extension,
   renderRaw,
