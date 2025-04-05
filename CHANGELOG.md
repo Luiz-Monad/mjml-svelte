@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.3.5...v1.4.0) (2025-04-05)
+
+
+### Features
+
+* custom mjml table component ([fef81a2](https://github.com/Luiz-Monad/mjml-svelte/commit/fef81a24ed616b5db3e0336898210c382ff3a595))
+
+
+### Bug Fixes
+
+* adding props to style ([f86ab81](https://github.com/Luiz-Monad/mjml-svelte/commit/f86ab81ff1ef88a2b40092f872fa03e8c3cb600c))
+* redeploy ([4e0de78](https://github.com/Luiz-Monad/mjml-svelte/commit/4e0de785d27ae649a3b6f232f46ddc479e98ba06))
+
 ## [1.3.5](https://github.com/Luiz-Monad/mjml-svelte/compare/v1.3.4...v1.3.5) (2025-04-03)
 
 
