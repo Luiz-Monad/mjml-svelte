@@ -1,7 +1,7 @@
 {
   "name": "mjml-svelte",
   "type": "module",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "Luiz Stangarlin <luiz.monad@gmail.com>",
   "keywords": [
     "vite",
