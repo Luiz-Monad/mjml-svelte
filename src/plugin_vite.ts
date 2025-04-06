@@ -299,12 +299,10 @@ export function mjmlPlugin(): Plugin[] {
         }
       },
 
-      handleHotUpdate({ server }) {
-        server.ws.send({
-          type: 'custom',
-          event: 'mjml',
-          data: {}
-        });
+      handleHotUpdate({ file, server, modules }) {
+        const req = requestParser(file);
+        if (!req) return modules;
+        server.ws.send({ type: 'custom', event: 'mjml', data: {} });
         return [];
       }
     },
